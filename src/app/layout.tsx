@@ -1,5 +1,6 @@
 import localFont from "next/font/local";
 
+import Header from "@/components/Header";
 import { cn } from "@/lib/utils";
 
 import Provider from "./Provider";
@@ -27,13 +28,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+      </head>
       <body
         className={cn(
           pretendard.variable,
-          "font-pretendard antialiased bg-zinc-900"
+          "font-pretendard antialiased bg-zinc-900 h-screen"
         )}
+        style={{ touchAction: "none" }}
       >
-        <Provider>{children}</Provider>
+        <Provider>
+          <div className="h-screen flex flex-col">
+            <Header />
+            <div className="flex-1 overflow-hidden touch-none">{children}</div>
+          </div>
+        </Provider>
       </body>
     </html>
   );
