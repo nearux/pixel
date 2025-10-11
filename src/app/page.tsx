@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
+import { ConnectButton } from "@/components/ConnectButton";
 
 export default function Home() {
-  return <Button variant="secondary">Pixel</Button>;
+  return <ConnectButton />;
 }

@@ -2,6 +2,8 @@ import localFont from "next/font/local";
 
 import { cn } from "@/lib/utils";
 
+import Provider from "./Provider";
+
 import type { Metadata } from "next";
 
 import "./globals.css";
@@ -31,7 +33,7 @@ export default function RootLayout({
           "font-pretendard antialiased bg-zinc-900"
         )}
       >
-        {children}
+        <Provider>{children}</Provider>
       </body>
     </html>
   );
