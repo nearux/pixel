@@ -1,0 +1,358 @@
+---
+globs: *.tsx,*.ts
+description: Functional component writing style guide
+---
+
+# Functional Component Writing Style Guide
+
+## Basic Principles
+
+### 1. Function Declaration Style
+
+- **Always use `function` keyword** (arrow functions are prohibited)
+- Component names should be in PascalCase
+
+```tsx
+// ✅ Correct way
+function MyComponent() {
+  return <div>Hello</div>;
+}
+
+// ❌ Incorrect way
+const MyComponent = () => {
+  return <div>Hello</div>;
+};
+```
+
+### 2. Export Pattern Distinction
+
+#### Page Components (Pages)
+
+- **Use `export default`**
+- File name and component name should be identical
+
+```tsx
+// src/app/page.tsx
+function Home() {
+  return <div>Home Page</div>;
+}
+
+export default Home;
+```
+
+```tsx
+// src/app/login/page.tsx
+function LoginPage() {
+  return <div>Login Page</div>;
+}
+
+export default LoginPage;
+```
+
+#### UI Components (Components)
+
+- **Use named exports** (for tree-shaking optimization)
+- Multiple components can be exported
+
+```tsx
+// src/components/ui/button.tsx
+function Button({ children, ...props }) {
+  return <button {...props}>{children}</button>;
+}
+
+function ButtonGroup({ children }) {
+  return <div className="button-group">{children}</div>;
+}
+
+export { Button, ButtonGroup };
+```
+
+### 3. Props Type Definition
+
+- Define Props interface above the component
+- Utilize React's built-in types
+
+```tsx
+interface ButtonProps {
+  variant?: "primary" | "secondary";
+  size?: "sm" | "md" | "lg";
+  children: React.ReactNode;
+}
+
+function Button({ variant = "primary", size = "md", children }: ButtonProps) {
+  return (
+    <button className={`btn btn-${variant} btn-${size}`}>{children}</button>
+  );
+}
+```
+
+### 4. Layout Components and PropsWithChildren Usage
+
+- Use `PropsWithChildren` type for components that accept children
+- Explicitly handle children prop
+- Combine with additional props when needed
+
+#### Basic Layout Component
+
+```tsx
+import { PropsWithChildren } from "react";
+
+function Layout({ children }: PropsWithChildren) {
+  return <div className="layout">{children}</div>;
+}
+
+export default Layout;
+```
+
+#### Layout with Additional Props
+
+```tsx
+import { PropsWithChildren } from "react";
+
+interface LayoutProps {
+  className?: string;
+  title?: string;
+}
+
+function Layout({
+  children,
+  className,
+  title,
+}: PropsWithChildren<LayoutProps>) {
+  return (
+    <div className={`layout ${className || ""}`}>
+      {title && <h1>{title}</h1>}
+      {children}
+    </div>
+  );
+}
+
+export default Layout;
+```
+
+#### Container Component with PropsWithChildren
+
+```tsx
+import { PropsWithChildren } from "react";
+
+interface ContainerProps {
+  maxWidth?: "sm" | "md" | "lg" | "xl";
+  padding?: "sm" | "md" | "lg";
+  center?: boolean;
+}
+
+function Container({
+  children,
+  maxWidth = "lg",
+  padding = "md",
+  center = false,
+}: PropsWithChildren<ContainerProps>) {
+  const maxWidthClass = `max-w-${maxWidth}`;
+  const paddingClass = `p-${padding}`;
+  const centerClass = center ? "mx-auto" : "";
+
+  return (
+    <div className={`${maxWidthClass} ${paddingClass} ${centerClass}`}>
+      {children}
+    </div>
+  );
+}
+
+export { Container };
+```
+
+#### Card Component with PropsWithChildren
+
+```tsx
+import { PropsWithChildren } from "react";
+
+interface CardProps {
+  variant?: "default" | "outlined" | "elevated";
+  padding?: "none" | "sm" | "md" | "lg";
+  className?: string;
+}
+
+function Card({
+  children,
+  variant = "default",
+  padding = "md",
+  className,
+}: PropsWithChildren<CardProps>) {
+  const variantClasses = {
+    default: "bg-white border border-gray-200",
+    outlined: "border-2 border-gray-300",
+    elevated: "bg-white shadow-lg",
+  };
+
+  const paddingClasses = {
+    none: "",
+    sm: "p-2",
+    md: "p-4",
+    lg: "p-6",
+  };
+
+  return (
+    <div
+      className={`rounded-lg ${variantClasses[variant]} ${
+        paddingClasses[padding]
+      } ${className || ""}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+export { Card };
+```
+
+#### Modal Component with PropsWithChildren
+
+```tsx
+import { PropsWithChildren } from "react";
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
+  size?: "sm" | "md" | "lg" | "xl";
+}
+
+function Modal({
+  children,
+  isOpen,
+  onClose,
+  title,
+  size = "md",
+}: PropsWithChildren<ModalProps>) {
+  if (!isOpen) return null;
+
+  const sizeClasses = {
+    sm: "max-w-sm",
+    md: "max-w-md",
+    lg: "max-w-lg",
+    xl: "max-w-xl",
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className={`bg-white rounded-lg ${sizeClasses[size]} w-full mx-4`}>
+        <div className="flex justify-between items-center p-4 border-b">
+          {title && <h2 className="text-lg font-semibold">{title}</h2>}
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            ×
+          </button>
+        </div>
+        <div className="p-4">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+export { Modal };
+```
+
+### 5. Export Patterns for Tree-shaking Optimization
+
+#### Individual Component Exports
+
+```tsx
+// src/components/ui/index.ts
+export { Button } from "./button";
+export { Input } from "./input";
+export { Card } from "./card";
+```
+
+#### Export Types and Components Together
+
+```tsx
+// src/components/ui/button.tsx
+export interface ButtonProps {
+  variant?: "primary" | "secondary";
+}
+
+function Button(props: ButtonProps) {
+  return <button {...props} />;
+}
+
+export { Button };
+```
+
+### 6. Import Order
+
+1. React-related imports
+2. External library imports
+3. Internal component/utility imports
+4. Type imports
+
+```tsx
+import React from "react";
+import { PropsWithChildren } from "react";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+
+import type { Metadata } from "next";
+```
+
+### 7. Metadata Export (Next.js)
+
+- Export page-specific metadata separately
+
+```tsx
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Page Title",
+  description: "Page description",
+};
+
+function Page() {
+  return <div>Page content</div>;
+}
+
+export default Page;
+```
+
+## Example File Structure
+
+### Page Component Example
+
+```tsx
+// src/app/page.tsx
+import { Button } from "@/components/ui/button";
+
+function Home() {
+  return (
+    <div>
+      <h1>Welcome</h1>
+      <Button variant="primary">Get Started</Button>
+    </div>
+  );
+}
+
+export default Home;
+```
+
+### UI Component Example
+
+```tsx
+// src/components/ui/card.tsx
+interface CardProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+function Card({ title, children }: CardProps) {
+  return (
+    <div className="card">
+      <h3>{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+export { Card };
+```
