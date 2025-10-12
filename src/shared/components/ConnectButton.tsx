@@ -1,6 +1,6 @@
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
-import { Button } from "./ui/button";
+import { Button } from "./Button";
 
 export const ConnectButton = () => {
   const { address } = useAccount();

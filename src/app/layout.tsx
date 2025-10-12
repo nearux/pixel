@@ -1,7 +1,7 @@
 import localFont from "next/font/local";
 
-import Header from "@/components/Header";
-import { cn } from "@/lib/utils";
+import Header from "@/shared/components/Header";
+import { cn } from "@/shared/utils/cn";
 
 import Provider from "./Provider";
 
