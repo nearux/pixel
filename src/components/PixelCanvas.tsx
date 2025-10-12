@@ -10,7 +10,7 @@ interface Pixel {
   isOwned: boolean;
 }
 
-const CANVAS_SIZE = 30;
+const CANVAS_SIZE = 5;
 const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 10;
 const ZOOM_STEP = 0.1;
@@ -110,12 +110,33 @@ export function PixelCanvas() {
     const offsetX = (canvasWidth - CANVAS_SIZE * pixelSize) / 2 + pan.x;
     const offsetY = (canvasHeight - CANVAS_SIZE * pixelSize) / 2 + pan.y;
 
+    // 그리드 라인 그리기
+    ctx.strokeStyle = "#9CA3AF";
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i <= CANVAS_SIZE; i++) {
+      const x = offsetX + i * pixelSize;
+      const y = offsetY + i * pixelSize;
+
+      // 세로선
+      ctx.beginPath();
+      ctx.moveTo(x, offsetY);
+      ctx.lineTo(x, offsetY + CANVAS_SIZE * pixelSize);
+      ctx.stroke();
+
+      // 가로선
+      ctx.beginPath();
+      ctx.moveTo(offsetX, y);
+      ctx.lineTo(offsetX + CANVAS_SIZE * pixelSize, y);
+      ctx.stroke();
+    }
+
     pixels.forEach((pixel) => {
       const x = offsetX + pixel.x * pixelSize;
       const y = offsetY + pixel.y * pixelSize;
 
-      ctx.fillStyle = pixel.color;
-      ctx.fillRect(x, y, pixelSize, pixelSize);
+      //   ctx.fillStyle = pixel.color;
+      //   ctx.fillRect(x, y, pixelSize, pixelSize);
 
       if (pixel.isOwned) {
         ctx.strokeStyle = "#000000";
