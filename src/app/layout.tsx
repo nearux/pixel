@@ -1,6 +1,6 @@
 import localFont from "next/font/local";
 
-import Header from "@/shared/components/Header";
+import { Header } from "@/shared/components/Header";
 import { cn } from "@/shared/utils/cn";
 
 import Provider from "./Provider";

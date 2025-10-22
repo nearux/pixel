@@ -42,8 +42,8 @@ const config: HardhatUserConfig = {
     giwaSepolia: {
       type: "http",
       chainType: "l1",
-      url: process.env.GIWA_SEPOLIA_RPC_URL as string,
-      accounts: [process.env.GIWA_SEPOLIA_PRIVATE_KEY as string],
+      url: process.env.NEXT_PUBLIC_GIWA_SEPOLIA_RPC_URL as string,
+      accounts: [process.env.NEXT_PUBLIC_GIWA_SEPOLIA_PRIVATE_KEY as string],
       chainId: 91342,
     },
   },

@@ -1,53 +1,63 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+import { useAllPixels, useContractInfo } from "./usePixelContract";
 
 interface Pixel {
   x: number;
   y: number;
-  color: string;
-  owner?: string;
+  text: string;
+  link: string;
+  owner: string;
   isOwned: boolean;
+  purchaseTime: number;
 }
 
-const CANVAS_SIZE = 5;
-
 export function usePixelState() {
-  const [pixels, setPixels] = useState<Pixel[]>(() => {
-    const initialPixels: Pixel[] = [];
-    for (let x = 0; x < CANVAS_SIZE; x++) {
-      for (let y = 0; y < CANVAS_SIZE; y++) {
-        initialPixels.push({
-          x,
-          y,
-          color: "#FFFFFF",
-          isOwned: false,
-        });
-      }
-    }
-    return initialPixels;
-  });
+  const { pixels: blockchainPixels, isLoading, refetch } = useAllPixels();
+  const { canvasSize } = useContractInfo();
+  const [localPixels, setLocalPixels] = useState<Pixel[]>([]);
 
-  const updatePixel = (x: number, y: number, updates: Partial<Pixel>) => {
-    setPixels((prevPixels) =>
-      prevPixels.map((pixel) =>
-        pixel.x === x && pixel.y === y ? { ...pixel, ...updates } : pixel
-      )
-    );
+  // 블록체인 데이터를 로컬 상태로 변환
+  useEffect(() => {
+    if (blockchainPixels) {
+      const convertedPixels: Pixel[] = [];
+
+      for (let x = 0; x < canvasSize; x++) {
+        for (let y = 0; y < canvasSize; y++) {
+          const pixelId = x * canvasSize + y;
+          const blockchainPixel = blockchainPixels[pixelId];
+
+          convertedPixels.push({
+            x,
+            y,
+            text: blockchainPixel?.text || "",
+            link: blockchainPixel?.link || "",
+            owner: blockchainPixel?.owner || "",
+            isOwned: blockchainPixel?.isOwned || false,
+            purchaseTime: blockchainPixel?.purchaseTime
+              ? Number(blockchainPixel.purchaseTime)
+              : 0,
+          });
+        }
+      }
+
+      setLocalPixels(convertedPixels);
+    }
+  }, [blockchainPixels, canvasSize]);
+
+  const getPixel = (x: number, y: number): Pixel | undefined => {
+    return localPixels.find((pixel) => pixel.x === x && pixel.y === y);
   };
 
-  const setPixelColor = (
-    x: number,
-    y: number,
-    color: string,
-    isOwned: boolean = true
-  ) => {
-    updatePixel(x, y, { color, isOwned });
+  const refreshPixels = () => {
+    refetch();
   };
 
   return {
-    pixels,
-    setPixels,
-    updatePixel,
-    setPixelColor,
-    CANVAS_SIZE,
+    pixels: localPixels,
+    isLoading,
+    refreshPixels,
+    getPixel,
+    CANVAS_SIZE: canvasSize,
   };
 }

@@ -18,7 +18,7 @@ contract PixelCanvasTest is Test {
     
     function testInitialState() public {
         assertEq(pixelCanvas.CANVAS_SIZE(), 5);
-        assertEq(pixelCanvas.PIXEL_PRICE(), 0.001 ether);
+        assertEq(pixelCanvas.PIXEL_PRICE(), 0.00000001 ether);
         assertEq(pixelCanvas.totalPixelsSold(), 0);
         assertEq(pixelCanvas.owner(), owner);
     }
@@ -27,7 +27,7 @@ contract PixelCanvasTest is Test {
         vm.deal(buyer1, 1 ether);
         
         vm.prank(buyer1);
-        pixelCanvas.purchasePixel{value: 0.001 ether}(
+        pixelCanvas.purchasePixel{value: 0.00000001 ether}(
             0, 0, "Hello World", "https://example.com"
         );
         
@@ -55,14 +55,14 @@ contract PixelCanvasTest is Test {
         );
         
         // 초과 지불된 금액이 반환되었는지 확인
-        assertEq(buyer1.balance, initialBalance - 0.001 ether);
+        assertEq(buyer1.balance, initialBalance - 0.00000001 ether);
     }
     
     function testUpdatePixel() public {
         // 먼저 픽셀 구매
         vm.deal(buyer1, 1 ether);
         vm.prank(buyer1);
-        pixelCanvas.purchasePixel{value: 0.001 ether}(
+        pixelCanvas.purchasePixel{value: 0.00000001 ether}(
             2, 2, "Original", "https://original.com"
         );
         
@@ -83,14 +83,14 @@ contract PixelCanvasTest is Test {
         
         // 첫 번째 구매
         vm.prank(buyer1);
-        pixelCanvas.purchasePixel{value: 0.001 ether}(
+        pixelCanvas.purchasePixel{value: 0.00000001 ether}(
             3, 3, "First", "https://first.com"
         );
         
         // 같은 픽셀을 다시 구매하려고 시도
         vm.prank(buyer2);
         vm.expectRevert(abi.encodeWithSelector(PixelCanvas.PixelAlreadyOwned.selector, 18)); // 3*5+3=18
-        pixelCanvas.purchasePixel{value: 0.001 ether}(
+        pixelCanvas.purchasePixel{value: 0.00000001 ether}(
             3, 3, "Second", "https://second.com"
         );
     }
@@ -101,7 +101,7 @@ contract PixelCanvasTest is Test {
         
         // buyer1이 픽셀 구매
         vm.prank(buyer1);
-        pixelCanvas.purchasePixel{value: 0.001 ether}(
+        pixelCanvas.purchasePixel{value: 0.00000001 ether}(
             4, 4, "Owner", "https://owner.com"
         );
         
@@ -116,7 +116,7 @@ contract PixelCanvasTest is Test {
         
         vm.prank(buyer1);
         vm.expectRevert(abi.encodeWithSelector(PixelCanvas.InvalidCoordinates.selector, 5, 0));
-        pixelCanvas.purchasePixel{value: 0.001 ether}(
+        pixelCanvas.purchasePixel{value: 0.00000001 ether}(
             5, 0, "Invalid", "https://invalid.com"
         );
     }
@@ -125,8 +125,8 @@ contract PixelCanvasTest is Test {
         vm.deal(buyer1, 1 ether);
         
         vm.prank(buyer1);
-        vm.expectRevert(abi.encodeWithSelector(PixelCanvas.InsufficientPayment.selector, 0.001 ether, 0.0005 ether));
-        pixelCanvas.purchasePixel{value: 0.0005 ether}(
+        vm.expectRevert(abi.encodeWithSelector(PixelCanvas.InsufficientPayment.selector, 0.00000001 ether, 0.0005 ether));
+        pixelCanvas.purchasePixel{value: 0.00000001 ether}(
             0, 1, "Insufficient", "https://insufficient.com"
         );
     }
@@ -136,7 +136,7 @@ contract PixelCanvasTest is Test {
         
         vm.prank(buyer1);
         vm.expectRevert(PixelCanvas.EmptyText.selector);
-        pixelCanvas.purchasePixel{value: 0.001 ether}(
+        pixelCanvas.purchasePixel{value: 0.00000001 ether}(
             0, 2, "", "https://empty.com"
         );
     }
@@ -147,12 +147,12 @@ contract PixelCanvasTest is Test {
         
         // 두 개의 픽셀 구매
         vm.prank(buyer1);
-        pixelCanvas.purchasePixel{value: 0.001 ether}(
+        pixelCanvas.purchasePixel{value: 0.00000001 ether}(
             0, 0, "First", "https://first.com"
         );
         
         vm.prank(buyer2);
-        pixelCanvas.purchasePixel{value: 0.001 ether}(
+        pixelCanvas.purchasePixel{value: 0.00000001 ether}(
             1, 1, "Second", "https://second.com"
         );
         
@@ -176,12 +176,12 @@ contract PixelCanvasTest is Test {
         
         // 픽셀 구매로 컨트랙트에 이더 입금
         vm.prank(buyer1);
-        pixelCanvas.purchasePixel{value: 0.001 ether}(
+        pixelCanvas.purchasePixel{value: 0.00000001 ether}(
             0, 0, "Test", "https://test.com"
         );
         
         uint256 contractBalance = pixelCanvas.getContractBalance();
-        assertEq(contractBalance, 0.001 ether);
+        assertEq(contractBalance, 0.00000001 ether);
         
         // 소유자가 인출 (owner에게 이더 지급)
         vm.deal(owner, 1 ether);
@@ -190,7 +190,7 @@ contract PixelCanvasTest is Test {
         vm.prank(owner);
         pixelCanvas.withdraw();
         
-        assertEq(owner.balance, ownerBalanceBefore + 0.001 ether);
+        assertEq(owner.balance, ownerBalanceBefore + 0.00000001 ether);
         assertEq(pixelCanvas.getContractBalance(), 0);
     }
     
@@ -198,7 +198,7 @@ contract PixelCanvasTest is Test {
         vm.deal(buyer1, 1 ether);
         
         vm.prank(buyer1);
-        pixelCanvas.purchasePixel{value: 0.001 ether}(
+        pixelCanvas.purchasePixel{value: 0.00000001 ether}(
             0, 0, "Test", "https://test.com"
         );
         

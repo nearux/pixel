@@ -6,7 +6,7 @@ contract PixelCanvas {
     uint256 public constant CANVAS_SIZE = 5;
     
     // 픽셀당 가격 (매우 저렴하게 설정)
-    uint256 public constant PIXEL_PRICE = 0.001 ether; // 0.001 ETH
+    uint256 public constant PIXEL_PRICE = 0.00000001 ether; // 0.00000001 ETH
     
     // 픽셀 정보 구조체
     struct Pixel {
