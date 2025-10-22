@@ -1,6 +1,6 @@
 import { createConfig, http } from "wagmi";
 import { mainnet, sepolia } from "wagmi/chains";
-import { injected, metaMask, walletConnect } from "wagmi/connectors";
+import { metaMask } from "wagmi/connectors";
 
 // GIWA Sepolia Testnet 설정
 const giwaSepolia = {
@@ -30,13 +30,7 @@ const giwaSepolia = {
 
 export const config = createConfig({
   chains: [giwaSepolia, sepolia, mainnet],
-  connectors: [
-    injected(),
-    metaMask(),
-    walletConnect({
-      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
-    }),
-  ],
+  connectors: [metaMask()],
   transports: {
     [giwaSepolia.id]: http(),
     [sepolia.id]: http(),

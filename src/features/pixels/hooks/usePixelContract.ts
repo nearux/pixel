@@ -138,8 +138,6 @@ export function useContractInfo() {
     functionName: "totalPixelsSold",
   });
 
-  console.log({ pixelPrice });
-
   return {
     canvasSize: canvasSize ? Number(canvasSize) : 5,
     pixelPrice: pixelPrice ? Number(pixelPrice) / 1e18 : 0.00000001, // Wei to ETH
