@@ -12,8 +12,8 @@
     "test": "hardhat test",
     "test:gas": "REPORT_GAS=true hardhat test",
     "coverage": "hardhat coverage",
-    "deploy:local": "hardhat ignition deploy ./ignition/modules/Counter.ts --network hardhat",
-    "deploy:giwa": "hardhat ignition deploy ./ignition/modules/Counter.ts --network giwaSepolia",
+    "deploy:local": "hardhat ignition deploy ./ignition/modules/PixelCanvas.ts --network hardhat",
+    "deploy:giwa": "hardhat ignition deploy ./ignition/modules/PixelCanvas.ts --network giwaSepolia",
     "verify:giwa": "hardhat verify --network giwaSepolia",
     "node": "hardhat node",
     "clean": "hardhat clean"
