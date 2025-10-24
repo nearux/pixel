@@ -36,7 +36,7 @@ function ToastItem({
   onRemove: (id: string) => void;
 }) {
   const bgColor = {
-    success: "bg-zinc-900",
+    success: "bg-zinc-700",
     error: "bg-red-500",
   }[toast.type];
 
