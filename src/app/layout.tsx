@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 
 import { Header } from "@/shared/components/Header";
+import { ToastContainer } from "@/shared/components/Toast/toastContainer";
 import { cn } from "@/shared/utils/cn";
 
 import Provider from "./Provider";
@@ -46,6 +47,7 @@ export default function RootLayout({
             <Header />
             <div className="flex-1 overflow-hidden touch-none">{children}</div>
           </div>
+          <ToastContainer />
         </Provider>
       </body>
     </html>

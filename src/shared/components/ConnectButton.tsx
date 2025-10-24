@@ -6,6 +6,7 @@ import { FiCopy } from "react-icons/fi";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { Button } from "./Button";
+import { toast } from "./Toast/toastManager";
 import { Tooltip, TooltipTrigger, TooltipContent } from "./Tooltip";
 
 export const ConnectButton = () => {
@@ -17,6 +18,7 @@ export const ConnectButton = () => {
     if (address) {
       try {
         await navigator.clipboard.writeText(address);
+        toast.success("Address copied to clipboard");
       } catch (err) {
         console.error("Failed to copy address:", err);
       }
