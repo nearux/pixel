@@ -30,14 +30,15 @@ export const ConnectButton = () => {
       <div className="flex items-center gap-4">
         <Tooltip>
           <TooltipTrigger asChild>
-            <FaUser size={18} />
+            <FaUser size={18} color="white" />
           </TooltipTrigger>
           <TooltipContent className="flex items-center gap-2">
-            <p>{address}</p>
+            <p className="font-bold">{address}</p>
             <FiCopy
               size={14}
               className="cursor-pointer hover:opacity-70 transition-opacity"
               onClick={copyAddress}
+              color="white"
             />
           </TooltipContent>
         </Tooltip>
@@ -48,10 +49,11 @@ export const ConnectButton = () => {
               className="cursor-pointer hover:opacity-70 transition-opacity"
               size={24}
               onClick={() => disconnect()}
+              color="white"
             />
           </TooltipTrigger>
           <TooltipContent>
-            <p>Disconnect</p>
+            <p className="font-bold">Disconnect</p>
           </TooltipContent>
         </Tooltip>
       </div>
