@@ -1,19 +1,15 @@
 "use client";
 
-import { useState } from "react";
-
 import { useAccount } from "wagmi";
+
+import { useOverlay } from "@/shared/hooks/useOverlay";
 
 import { usePixelState } from "../hooks";
 import { PixelPurchaseModal } from "./PixelPurchaseModal";
 
 export function PixelCanvas() {
+  const overlay = useOverlay();
   const { isConnected } = useAccount();
-  const [selectedPixel, setSelectedPixel] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
   const { isLoading, refreshPixels, getPixel, CANVAS_SIZE } = usePixelState();
 
@@ -33,15 +29,16 @@ export function PixelCanvas() {
         return;
       }
 
-      setSelectedPixel({ x, y });
-      setShowPurchaseModal(true);
+      overlay.open(({ isOpen, close }) => (
+        <PixelPurchaseModal
+          isOpen={isOpen}
+          onClose={close}
+          x={x}
+          y={y}
+          onSuccess={refreshPixels}
+        />
+      ));
     }
-  };
-
-  const handlePurchaseSuccess = () => {
-    setShowPurchaseModal(false);
-    setSelectedPixel(null);
-    refreshPixels(); // 블록체인 데이터 새로고침
   };
 
   if (isLoading) {
@@ -100,16 +97,6 @@ export function PixelCanvas() {
           })}
         </div>
       </div>
-
-      {showPurchaseModal && selectedPixel && (
-        <PixelPurchaseModal
-          isOpen={showPurchaseModal}
-          onClose={() => setShowPurchaseModal(false)}
-          x={selectedPixel.x}
-          y={selectedPixel.y}
-          onSuccess={handlePurchaseSuccess}
-        />
-      )}
     </div>
   );
 }
