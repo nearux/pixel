@@ -2,6 +2,7 @@
 
 import { useAccount } from "wagmi";
 
+import { toast } from "@/shared/components/Toast/toastManager";
 import { useOverlay } from "@/shared/hooks/useOverlay";
 
 import { usePixelState } from "../hooks";
@@ -18,14 +19,12 @@ export function PixelCanvas() {
     const pixel = getPixel(x, y);
 
     if (pixel?.isOwned) {
-      // 이미 소유된 픽셀 - 텍스트/링크 표시
       if (pixel.link) {
         window.open(pixel.link, "_blank");
       }
     } else {
-      // 소유되지 않은 픽셀 - 구매 모달 표시
       if (!isConnected) {
-        alert("지갑을 연결해주세요.");
+        toast.error("Please connect your wallet.");
         return;
       }
 
@@ -44,20 +43,13 @@ export function PixelCanvas() {
   if (isLoading) {
     return (
       <div className="w-full h-full flex items-center justify-center">
-        <div className="text-gray-600">픽셀 데이터를 불러오는 중...</div>
+        <div className="text-gray-600">Loading pixel data...</div>
       </div>
     );
   }
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
-      {/* <div className="mb-4 text-sm text-gray-600">
-        <p>• 빈 픽셀을 클릭하면 구매할 수 있습니다</p>
-        <p>• 소유된 픽셀을 클릭하면 링크로 이동합니다</p>
-        <p>• 가격: 0.00000001 ETH</p>
-      </div> */}
-
-      {/* 5x5 그리드 */}
       <div className="overflow-auto p-4">
         <div className="grid grid-cols-5 gap-2 w-fit mx-auto">
           {Array.from({ length: CANVAS_SIZE * CANVAS_SIZE }, (_, index) => {
