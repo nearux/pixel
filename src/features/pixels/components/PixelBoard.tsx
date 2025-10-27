@@ -8,15 +8,15 @@ import { useOverlay } from "@/shared/hooks/useOverlay";
 import { usePixelState } from "../hooks";
 import { PixelPurchaseModal } from "./PixelPurchaseModal";
 
-export function PixelCanvas() {
+export function PixelBoard() {
   const overlay = useOverlay();
   const { isConnected } = useAccount();
 
   const { isLoading, refreshPixels, getPixel, CANVAS_SIZE } = usePixelState();
 
   // 픽셀 클릭 핸들러
-  const handlePixelClick = (x: number, y: number) => {
-    const pixel = getPixel(x, y);
+  const handlePixelClick = (pixelIndex: number) => {
+    const pixel = getPixel(pixelIndex);
 
     if (pixel?.isOwned) {
       if (pixel.link) {
@@ -32,8 +32,7 @@ export function PixelCanvas() {
         <PixelPurchaseModal
           isOpen={isOpen}
           onClose={close}
-          x={x}
-          y={y}
+          pixelIndex={pixelIndex}
           onSuccess={refreshPixels}
         />
       ));
@@ -53,9 +52,7 @@ export function PixelCanvas() {
       <div className="overflow-auto p-4">
         <div className="grid grid-cols-5 gap-2 w-fit mx-auto">
           {Array.from({ length: CANVAS_SIZE * CANVAS_SIZE }, (_, index) => {
-            const x = Math.floor(index / CANVAS_SIZE);
-            const y = index % CANVAS_SIZE;
-            const pixel = getPixel(x, y);
+            const pixel = getPixel(index);
 
             return (
               <div

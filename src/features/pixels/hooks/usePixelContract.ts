@@ -5,10 +5,10 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 
-import { PIXEL_CANVAS_ABI, type PixelData } from "@/shared/lib/contract";
+import { PIXEL_BOARD_ABI, type PixelData } from "@/shared/lib/contract";
 
-const PIXEL_CANVAS_ADDRESS = process.env
-  .NEXT_PUBLIC_PIXEL_CANVAS_ADDRESS as `0x${string}`;
+const PIXEL_BOARD_ADDRESS = process.env
+  .NEXT_PUBLIC_PIXEL_BOARD_ADDRESS as `0x${string}`;
 
 // 픽셀 구매 훅
 export function usePurchasePixel() {
@@ -20,17 +20,17 @@ export function usePurchasePixel() {
     });
 
   const purchasePixel = async (
-    x: number,
-    y: number,
+    pixelIndex: number,
     text: string,
+    imageUrl: string,
     link: string
   ) => {
     try {
       await writeContract({
-        address: PIXEL_CANVAS_ADDRESS,
-        abi: PIXEL_CANVAS_ABI,
+        address: PIXEL_BOARD_ADDRESS,
+        abi: PIXEL_BOARD_ABI,
         functionName: "purchasePixel",
-        args: [BigInt(x), BigInt(y), text, link],
+        args: [BigInt(pixelIndex), text, imageUrl, link],
         value: parseEther("0.00000001"),
       });
     } catch (err) {
@@ -58,17 +58,17 @@ export function useUpdatePixel() {
     });
 
   const updatePixel = async (
-    x: number,
-    y: number,
+    pixelIndex: number,
     text: string,
+    imageUrl: string,
     link: string
   ) => {
     try {
       await writeContract({
-        address: PIXEL_CANVAS_ADDRESS,
-        abi: PIXEL_CANVAS_ABI,
+        address: PIXEL_BOARD_ADDRESS,
+        abi: PIXEL_BOARD_ABI,
         functionName: "updatePixel",
-        args: [BigInt(x), BigInt(y), text, link],
+        args: [BigInt(pixelIndex), text, imageUrl, link],
       });
     } catch (err) {
       console.error("Failed to update pixel:", err);
@@ -86,12 +86,12 @@ export function useUpdatePixel() {
 }
 
 // 특정 픽셀 조회 훅
-export function usePixel(x: number, y: number) {
+export function usePixel(pixelIndex: number) {
   const { data, isLoading, error, refetch } = useReadContract({
-    address: PIXEL_CANVAS_ADDRESS,
-    abi: PIXEL_CANVAS_ABI,
+    address: PIXEL_BOARD_ADDRESS,
+    abi: PIXEL_BOARD_ABI,
     functionName: "getPixel",
-    args: [BigInt(x), BigInt(y)],
+    args: [BigInt(pixelIndex)],
   });
 
   return {
@@ -105,8 +105,8 @@ export function usePixel(x: number, y: number) {
 // 모든 픽셀 조회 훅
 export function useAllPixels() {
   const { data, isLoading, error, refetch } = useReadContract({
-    address: PIXEL_CANVAS_ADDRESS,
-    abi: PIXEL_CANVAS_ABI,
+    address: PIXEL_BOARD_ADDRESS,
+    abi: PIXEL_BOARD_ABI,
     functionName: "getAllPixels",
   });
 
@@ -120,26 +120,26 @@ export function useAllPixels() {
 
 // 컨트랙트 정보 조회 훅
 export function useContractInfo() {
-  const { data: canvasSize } = useReadContract({
-    address: PIXEL_CANVAS_ADDRESS,
-    abi: PIXEL_CANVAS_ABI,
-    functionName: "CANVAS_SIZE",
+  const { data: totalPixels } = useReadContract({
+    address: PIXEL_BOARD_ADDRESS,
+    abi: PIXEL_BOARD_ABI,
+    functionName: "TOTAL_PIXELS",
   });
 
   const { data: pixelPrice } = useReadContract({
-    address: PIXEL_CANVAS_ADDRESS,
-    abi: PIXEL_CANVAS_ABI,
-    functionName: "PIXEL_PRICE",
+    address: PIXEL_BOARD_ADDRESS,
+    abi: PIXEL_BOARD_ABI,
+    functionName: "INITIAL_PIXEL_PRICE",
   });
 
   const { data: totalPixelsSold } = useReadContract({
-    address: PIXEL_CANVAS_ADDRESS,
-    abi: PIXEL_CANVAS_ABI,
+    address: PIXEL_BOARD_ADDRESS,
+    abi: PIXEL_BOARD_ABI,
     functionName: "totalPixelsSold",
   });
 
   return {
-    canvasSize: canvasSize ? Number(canvasSize) : 5,
+    totalPixels: totalPixels ? Number(totalPixels) : 9,
     pixelPrice: pixelPrice ? Number(pixelPrice) / 1e18 : 0.00000001, // Wei to ETH
     totalPixelsSold: totalPixelsSold ? Number(totalPixelsSold) : 0,
   };

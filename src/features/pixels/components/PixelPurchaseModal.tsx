@@ -9,22 +9,21 @@ import { usePurchasePixel } from "../hooks/usePixelContract";
 interface PixelPurchaseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  x: number;
-  y: number;
+  pixelIndex: number;
   onSuccess?: () => void;
 }
 
 function PixelPurchaseModal({
   isOpen,
   onClose,
-  x,
-  y,
+  pixelIndex,
   onSuccess,
 }: PixelPurchaseModalProps) {
   const { isConnected } = useAccount();
   const { purchasePixel, isPending, isSuccess, error } = usePurchasePixel();
   const [text, setText] = useState("");
   const [link, setLink] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +34,12 @@ function PixelPurchaseModal({
     }
 
     try {
-      await purchasePixel(x, y, text.trim(), link.trim());
+      await purchasePixel(
+        pixelIndex,
+        text.trim(),
+        imageUrl.trim(),
+        link.trim()
+      );
       if (onSuccess) onSuccess();
     } catch (err) {
       console.error("Purchase failed:", err);
@@ -64,9 +68,7 @@ function PixelPurchaseModal({
         </div>
 
         <div className="mb-4">
-          <p className="text-sm text-gray-600">
-            위치: ({x}, {y})
-          </p>
+          <p className="text-sm text-gray-600">위치: ({pixelIndex})</p>
           <p className="text-sm text-gray-600">가격: 0.00000001 ETH</p>
         </div>
 

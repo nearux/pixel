@@ -3,8 +3,7 @@ import { useState, useEffect } from "react";
 import { useAllPixels, useContractInfo } from "./usePixelContract";
 
 interface Pixel {
-  x: number;
-  y: number;
+  pixelIndex: number;
   text: string;
   link: string;
   owner: string;
@@ -45,8 +44,8 @@ export function usePixelState() {
     }
   }, [blockchainPixels, canvasSize]);
 
-  const getPixel = (x: number, y: number): Pixel | undefined => {
-    return localPixels.find((pixel) => pixel.x === x && pixel.y === y);
+  const getPixel = (pixelIndex: number): Pixel | undefined => {
+    return localPixels.find((pixel) => pixel.pixelIndex === pixelIndex);
   };
 
   const refreshPixels = () => {

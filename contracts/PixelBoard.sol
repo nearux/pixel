@@ -7,6 +7,7 @@ contract PixelBoard {
     uint256 public constant INITIAL_PIXEL_PRICE = 0.00000001 ether;
     
     struct Pixel {
+        uint256 id;
         address owner;
         string text;
         string imageUrl;
@@ -92,6 +93,7 @@ contract PixelBoard {
         
  
         pixels[pixelId] = Pixel({
+            id: pixelId,
             owner: msg.sender,
             text: text,
             imageUrl: imageUrl,
@@ -144,7 +146,11 @@ contract PixelBoard {
     }
     
     function getPixel(uint256 pixelId) external view returns (Pixel memory) {
-        return pixels[pixelId];
+        Pixel memory pixel = pixels[pixelId];
+        if (!pixel.isOwned) {
+            pixel.id = pixelId;
+        }
+        return pixel;
     }
     
     function getPixelCurrentPrice(uint256 pixelId) external view returns (uint256) {
@@ -156,6 +162,9 @@ contract PixelBoard {
         
         for (uint256 i = 0; i < TOTAL_PIXELS; i++) {
             allPixels[i] = pixels[i];
+            if (!allPixels[i].isOwned) {
+                allPixels[i].id = i;
+            }
         }
         
         return allPixels;

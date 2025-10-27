@@ -12,7 +12,7 @@
     "test": "hardhat test",
     "test:gas": "REPORT_GAS=true hardhat test",
     "coverage": "hardhat coverage",
-    "deploy:giwa": "hardhat ignition deploy ./ignition/modules/PixelCanvas.ts --network giwaSepolia",
+    "deploy:giwa": "hardhat ignition deploy ./ignition/modules/PixelBoard.ts --network giwaSepolia",
     "verify:giwa": "hardhat verify --network giwaSepolia",
     "node": "hardhat node",
     "clean": "hardhat clean"
