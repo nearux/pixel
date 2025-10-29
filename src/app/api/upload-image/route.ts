@@ -30,9 +30,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const timestamp = Date.now();
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const timeHash = `${hours}${minutes}`;
+
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const fileName = `${timestamp}_${originalName}`;
+    const fileName = `${timeHash}_${originalName}`;
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);

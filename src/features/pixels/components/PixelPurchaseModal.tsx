@@ -39,7 +39,7 @@ function PixelPurchaseModal({
   onSuccess,
 }: PixelPurchaseModalProps) {
   const pixelPrice = useGetPixelPrice(pixelIndex);
-  const { purchasePixel, isPending } = usePurchasePixel();
+  const { purchasePixel, isPending, isSuccess } = usePurchasePixel();
 
   const pixelPriceInEther = weiToEther(pixelPrice);
 
@@ -61,6 +61,14 @@ function PixelPurchaseModal({
       reset();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      onSuccess?.();
+      reset();
+      onClose();
+    }
+  }, [isSuccess]);
 
   const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -99,7 +107,6 @@ function PixelPurchaseModal({
       });
 
       onSuccess?.();
-      reset();
     } catch (err) {
       console.error("Purchase failed:", err);
     }

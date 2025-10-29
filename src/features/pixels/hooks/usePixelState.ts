@@ -5,6 +5,7 @@ import { useAllPixels } from "./usePixelContract";
 export interface Pixel {
   pixelIndex: number;
   text: string;
+  imageUrl: string;
   link: string;
   owner: string;
   isOwned: boolean;
@@ -25,6 +26,7 @@ export function usePixelState() {
         convertedPixels.push({
           pixelIndex: x,
           text: blockchainPixel?.text || "",
+          imageUrl: blockchainPixel?.imageUrl || "",
           link: blockchainPixel?.link || "",
           owner: blockchainPixel?.owner || "",
           isOwned: blockchainPixel?.isOwned || false,
