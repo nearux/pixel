@@ -19,19 +19,26 @@ export function usePurchasePixel() {
       hash,
     });
 
-  const purchasePixel = async (
-    pixelIndex: number,
-    text: string,
-    imageUrl: string,
-    link: string
-  ) => {
+  const purchasePixel = async ({
+    pixelIndex,
+    text,
+    imageUrl,
+    link,
+    price,
+  }: {
+    pixelIndex: number;
+    text: string;
+    imageUrl: string;
+    link: string;
+    price: string;
+  }) => {
     try {
       await writeContract({
         address: PIXEL_BOARD_ADDRESS,
         abi: PIXEL_BOARD_ABI,
         functionName: "purchasePixel",
         args: [BigInt(pixelIndex), text, imageUrl, link],
-        value: parseEther("0.00000001"),
+        value: parseEther(price),
       });
     } catch (err) {
       console.error("Failed to purchase pixel:", err);

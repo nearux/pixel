@@ -41,6 +41,8 @@ function PixelPurchaseModal({
   const pixelPrice = useGetPixelPrice(pixelIndex);
   const { purchasePixel, isPending } = usePurchasePixel();
 
+  const pixelPriceInEther = weiToEther(pixelPrice);
+
   const { register, handleSubmit, watch, reset } = useForm<PixelForm>({
     defaultValues: {
       title: "",
@@ -61,8 +63,21 @@ function PixelPurchaseModal({
   }, [isOpen]);
 
   const uploadImage = async (file: File): Promise<string> => {
-    console.log("Image upload not implemented yet:", file.name);
-    return "";
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await fetch("/api/upload-image", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to upload image");
+    }
+
+    const data = await response.json();
+    return data.imageUrl;
   };
 
   const onSubmit = async (form: PixelForm) => {
@@ -70,14 +85,20 @@ function PixelPurchaseModal({
 
     let imageUrl = "";
 
-    // 이미지 파일이 있으면 업로드
-    if (imageFile && imageFile.length > 0) {
+    if (imageFile) {
       imageUrl = await uploadImage(imageFile[0]);
     }
 
     try {
-      await purchasePixel(pixelIndex, title.trim(), imageUrl, link.trim());
-      if (onSuccess) onSuccess();
+      await purchasePixel({
+        price: pixelPriceInEther,
+        pixelIndex,
+        text: title.trim(),
+        imageUrl: imageUrl.trim(),
+        link: link.trim(),
+      });
+
+      onSuccess?.();
       reset();
     } catch (err) {
       console.error("Purchase failed:", err);
@@ -89,12 +110,15 @@ function PixelPurchaseModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px]">
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <DialogHeader>
               <DialogTitle>Pixel Purchase</DialogTitle>
               <DialogDescription>
-                Claim your pixel for <strong>{weiToEther(pixelPrice)}</strong>{" "}
+                Claim your pixel for <strong>{pixelPriceInEther}</strong>{" "}
                 Ethereum
               </DialogDescription>
             </DialogHeader>
@@ -169,8 +193,8 @@ function PixelPurchaseModal({
                 {isPending ? "Processing..." : "Save changes"}
               </Button>
             </DialogFooter>
-          </DialogContent>
-        </form>
+          </form>
+        </DialogContent>
       </Dialog>
     </>
   );
