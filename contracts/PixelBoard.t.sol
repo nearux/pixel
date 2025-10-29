@@ -32,6 +32,7 @@ contract PixelBoardTest is Test {
         );
 
         PixelBoard.Pixel memory pixel = pixelBoard.getPixel(0);
+        assertEq(pixel.id, 0);
         assertEq(pixel.owner, buyer1);
         assertEq(pixel.text, "Hello World");
         assertEq(pixel.imageUrl, "https://example.com/image.png");
@@ -203,9 +204,12 @@ contract PixelBoardTest is Test {
         
         assertEq(allPixels.length, 9);
         
+        assertEq(allPixels[0].id, 0);
         assertEq(allPixels[0].owner, buyer1);
+        assertEq(allPixels[1].id, 1);
         assertEq(allPixels[1].owner, buyer2);
         
+        assertEq(allPixels[2].id, 2);
         assertEq(allPixels[2].owner, address(0));
         assertFalse(allPixels[2].isOwned);
     }
@@ -241,6 +245,7 @@ contract PixelBoardTest is Test {
         
         PixelBoard.Pixel[] memory allPixels = pixelBoard.getAllPixels();
         for (uint i = 0; i < 9; i++) {
+            assertEq(allPixels[i].id, i);
             assertTrue(allPixels[i].isOwned);
             assertEq(allPixels[i].owner, buyer1);
         }

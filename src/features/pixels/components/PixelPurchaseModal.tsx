@@ -1,141 +1,209 @@
-import { useState } from "react";
+import { useEffect } from "react";
 
-import { useAccount } from "wagmi";
+import { useForm } from "react-hook-form";
 
 import { Button } from "@/shared/components/Button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/Dialog";
+import { Input } from "@/shared/components/Input";
+import { weiToEther } from "@/shared/utils/weiToEther";
 
-import { usePurchasePixel } from "../hooks/usePixelContract";
+import { ImagePreview } from "./ImagePreview";
+import { useImagePreview } from "../hooks/useImagePreview";
+import { useGetPixelPrice, usePurchasePixel } from "../hooks/usePixelContract";
 
 interface PixelPurchaseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  x: number;
-  y: number;
+  pixelIndex: number;
   onSuccess?: () => void;
 }
+
+export type PixelForm = {
+  title: string;
+  link: string;
+  imageFile: FileList | null;
+};
 
 function PixelPurchaseModal({
   isOpen,
   onClose,
-  x,
-  y,
+  pixelIndex,
   onSuccess,
 }: PixelPurchaseModalProps) {
-  const { isConnected } = useAccount();
-  const { purchasePixel, isPending, isSuccess, error } = usePurchasePixel();
-  const [text, setText] = useState("");
-  const [link, setLink] = useState("");
+  const pixelPrice = useGetPixelPrice(pixelIndex);
+  const { purchasePixel, isPending, isSuccess } = usePurchasePixel();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const pixelPriceInEther = weiToEther(pixelPrice);
 
-    if (!text.trim()) {
-      alert("텍스트를 입력해주세요.");
-      return;
+  const { register, handleSubmit, watch, reset } = useForm<PixelForm>({
+    defaultValues: {
+      title: "",
+      link: "",
+      imageFile: null,
+    },
+  });
+
+  const { previewImage, handleRemoveImage } = useImagePreview({
+    imageFile: watch("imageFile"),
+    reset,
+  });
+
+  useEffect(() => {
+    if (!isOpen) {
+      reset();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      onSuccess?.();
+      reset();
+      onClose();
+    }
+  }, [isSuccess]);
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await fetch("/api/upload-image", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to upload image");
+    }
+
+    const data = await response.json();
+    return data.imageUrl;
+  };
+
+  const onSubmit = async (form: PixelForm) => {
+    const { title, link, imageFile } = form;
+
+    let imageUrl = "";
+
+    if (imageFile) {
+      imageUrl = await uploadImage(imageFile[0]);
     }
 
     try {
-      await purchasePixel(x, y, text.trim(), link.trim());
-      if (onSuccess) onSuccess();
+      await purchasePixel({
+        price: pixelPriceInEther,
+        pixelIndex,
+        text: title.trim(),
+        imageUrl: imageUrl.trim(),
+        link: link.trim(),
+      });
+
+      onSuccess?.();
     } catch (err) {
       console.error("Purchase failed:", err);
     }
   };
 
-  const handleClose = () => {
-    setText("");
-    setLink("");
-    onClose();
-  };
-
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg max-w-md w-full mx-4 p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">픽셀 구매</h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl"
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={handleSubmit(onSubmit)}
           >
-            ×
-          </button>
-        </div>
-
-        <div className="mb-4">
-          <p className="text-sm text-gray-600">
-            위치: ({x}, {y})
-          </p>
-          <p className="text-sm text-gray-600">가격: 0.00000001 ETH</p>
-        </div>
-
-        {!isConnected ? (
-          <div className="text-center py-8">
-            <p className="text-gray-600 mb-4">지갑을 연결해주세요</p>
-            <Button onClick={() => window.location.reload()}>지갑 연결</Button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                표시할 텍스트 *
-              </label>
-              <input
-                type="text"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="예: Hello World"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                링크 URL
-              </label>
-              <input
-                type="url"
-                value={link}
-                onChange={(e) => setLink(e.target.value)}
-                placeholder="https://example.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {error && (
-              <div className="text-red-600 text-sm">오류: {error.message}</div>
-            )}
-
-            {isSuccess && (
-              <div className="text-green-600 text-sm">
-                픽셀 구매가 완료되었습니다!
+            <DialogHeader>
+              <DialogTitle>Pixel Purchase</DialogTitle>
+              <DialogDescription>
+                Claim your pixel for <strong>{pixelPriceInEther}</strong>{" "}
+                Ethereum
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4">
+              <div className="grid gap-3">
+                <label htmlFor="imageFile">* Image</label>
+                {previewImage ? (
+                  <ImagePreview
+                    previewImage={previewImage}
+                    handleRemoveImage={handleRemoveImage}
+                  />
+                ) : (
+                  <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
+                    <Input
+                      id="imageFile"
+                      type="file"
+                      accept="image/png, image/jpeg"
+                      className="hidden"
+                      {...register("imageFile")}
+                    />
+                    <label
+                      htmlFor="imageFile"
+                      className="cursor-pointer flex flex-col items-center gap-2"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const input = document.getElementById(
+                          "imageFile"
+                        ) as HTMLInputElement;
+                        input?.click();
+                      }}
+                    >
+                      <span className="text-sm text-gray-600">
+                        Click to upload image
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        PNG, JPG up to 5MB
+                      </span>
+                    </label>
+                  </div>
+                )}
               </div>
-            )}
-
-            <div className="flex gap-2 pt-4">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleClose}
-                disabled={isPending}
-                className="flex-1"
-              >
-                취소
-              </Button>
+              <div className="grid gap-3">
+                <label htmlFor="title">* Title</label>
+                <Input
+                  type="text"
+                  placeholder="Hello, World"
+                  {...register("title")}
+                />
+              </div>
+              <div className="grid gap-3">
+                <label htmlFor="link">* Pixel Link</label>
+                <Input
+                  type="url"
+                  placeholder="https://example.com"
+                  {...register("link")}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
               <Button
                 type="submit"
-                disabled={isPending || !text.trim()}
-                className="flex-1"
+                disabled={
+                  isPending ||
+                  !watch("imageFile") ||
+                  !watch("title") ||
+                  !watch("link")
+                }
               >
-                {isPending ? "처리 중..." : "구매하기"}
+                {isPending ? "Processing..." : "Purchase"}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
-        )}
-      </div>
-    </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

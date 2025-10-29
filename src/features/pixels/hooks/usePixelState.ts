@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 
-import { useAllPixels, useContractInfo } from "./usePixelContract";
+import { useAllPixels } from "./usePixelContract";
 
-interface Pixel {
-  x: number;
-  y: number;
+export interface Pixel {
+  pixelIndex: number;
   text: string;
+  imageUrl: string;
   link: string;
   owner: string;
   isOwned: boolean;
@@ -14,39 +14,34 @@ interface Pixel {
 
 export function usePixelState() {
   const { pixels: blockchainPixels, isLoading, refetch } = useAllPixels();
-  const { canvasSize } = useContractInfo();
   const [localPixels, setLocalPixels] = useState<Pixel[]>([]);
 
-  // 블록체인 데이터를 로컬 상태로 변환
   useEffect(() => {
     if (blockchainPixels) {
       const convertedPixels: Pixel[] = [];
 
-      for (let x = 0; x < canvasSize; x++) {
-        for (let y = 0; y < canvasSize; y++) {
-          const pixelId = x * canvasSize + y;
-          const blockchainPixel = blockchainPixels[pixelId];
+      for (let x = 0; x < blockchainPixels.length; x++) {
+        const blockchainPixel = blockchainPixels[x];
 
-          convertedPixels.push({
-            x,
-            y,
-            text: blockchainPixel?.text || "",
-            link: blockchainPixel?.link || "",
-            owner: blockchainPixel?.owner || "",
-            isOwned: blockchainPixel?.isOwned || false,
-            purchaseTime: blockchainPixel?.purchaseTime
-              ? Number(blockchainPixel.purchaseTime)
-              : 0,
-          });
-        }
+        convertedPixels.push({
+          pixelIndex: x,
+          text: blockchainPixel?.text || "",
+          imageUrl: blockchainPixel?.imageUrl || "",
+          link: blockchainPixel?.link || "",
+          owner: blockchainPixel?.owner || "",
+          isOwned: blockchainPixel?.isOwned || false,
+          purchaseTime: blockchainPixel?.purchaseTime
+            ? Number(blockchainPixel.purchaseTime)
+            : 0,
+        });
       }
 
       setLocalPixels(convertedPixels);
     }
-  }, [blockchainPixels, canvasSize]);
+  }, [blockchainPixels]);
 
-  const getPixel = (x: number, y: number): Pixel | undefined => {
-    return localPixels.find((pixel) => pixel.x === x && pixel.y === y);
+  const getPixel = (pixelIndex: number): Pixel | undefined => {
+    return localPixels.find((pixel) => pixel.pixelIndex === pixelIndex);
   };
 
   const refreshPixels = () => {
@@ -58,6 +53,5 @@ export function usePixelState() {
     isLoading,
     refreshPixels,
     getPixel,
-    CANVAS_SIZE: canvasSize,
   };
 }

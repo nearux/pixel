@@ -1,35 +1,9 @@
-// PixelCanvas 컨트랙트 ABI
-export const PIXEL_CANVAS_ABI = [
+// PixelBoard 컨트랙트 ABI
+export const PIXEL_BOARD_ABI = [
   {
     inputs: [],
     stateMutability: "nonpayable",
     type: "constructor",
-  },
-  {
-    inputs: [],
-    name: "CANVAS_SIZE",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "PIXEL_PRICE",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
   },
   {
     inputs: [],
@@ -56,16 +30,11 @@ export const PIXEL_CANVAS_ABI = [
     inputs: [
       {
         internalType: "uint256",
-        name: "x",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "y",
+        name: "pixelId",
         type: "uint256",
       },
     ],
-    name: "InvalidCoordinates",
+    name: "InvalidPixelIndex",
     type: "error",
   },
   {
@@ -77,17 +46,6 @@ export const PIXEL_CANVAS_ABI = [
       },
     ],
     name: "NotPixelOwner",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "pixelId",
-        type: "uint256",
-      },
-    ],
-    name: "PixelAlreadyOwned",
     type: "error",
   },
   {
@@ -107,20 +65,14 @@ export const PIXEL_CANVAS_ABI = [
       },
       {
         indexed: false,
-        internalType: "uint256",
-        name: "x",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "y",
-        type: "uint256",
+        internalType: "string",
+        name: "text",
+        type: "string",
       },
       {
         indexed: false,
         internalType: "string",
-        name: "text",
+        name: "imageUrl",
         type: "string",
       },
       {
@@ -133,6 +85,12 @@ export const PIXEL_CANVAS_ABI = [
         indexed: false,
         internalType: "uint256",
         name: "price",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "purchaseCount",
         type: "uint256",
       },
     ],
@@ -163,12 +121,44 @@ export const PIXEL_CANVAS_ABI = [
       {
         indexed: false,
         internalType: "string",
+        name: "imageUrl",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "string",
         name: "link",
         type: "string",
       },
     ],
     name: "PixelUpdated",
     type: "event",
+  },
+  {
+    inputs: [],
+    name: "INITIAL_PIXEL_PRICE",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "TOTAL_PIXELS",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
   },
   {
     inputs: [],
@@ -188,6 +178,11 @@ export const PIXEL_CANVAS_ABI = [
           },
           {
             internalType: "string",
+            name: "imageUrl",
+            type: "string",
+          },
+          {
+            internalType: "string",
             name: "link",
             type: "string",
           },
@@ -198,11 +193,16 @@ export const PIXEL_CANVAS_ABI = [
           },
           {
             internalType: "uint256",
+            name: "purchaseCount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
             name: "purchaseTime",
             type: "uint256",
           },
         ],
-        internalType: "struct PixelCanvas.Pixel",
+        internalType: "struct PixelBoard.Pixel[]",
         name: "",
         type: "tuple[]",
       },
@@ -227,12 +227,7 @@ export const PIXEL_CANVAS_ABI = [
     inputs: [
       {
         internalType: "uint256",
-        name: "x",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "y",
+        name: "pixelId",
         type: "uint256",
       },
     ],
@@ -252,6 +247,11 @@ export const PIXEL_CANVAS_ABI = [
           },
           {
             internalType: "string",
+            name: "imageUrl",
+            type: "string",
+          },
+          {
+            internalType: "string",
             name: "link",
             type: "string",
           },
@@ -262,11 +262,16 @@ export const PIXEL_CANVAS_ABI = [
           },
           {
             internalType: "uint256",
+            name: "purchaseCount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
             name: "purchaseTime",
             type: "uint256",
           },
         ],
-        internalType: "struct PixelCanvas.Pixel",
+        internalType: "struct PixelBoard.Pixel",
         name: "",
         type: "tuple",
       },
@@ -277,12 +282,31 @@ export const PIXEL_CANVAS_ABI = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
+        internalType: "uint256",
+        name: "pixelId",
+        type: "uint256",
       },
     ],
-    name: "ownerPixelCount",
+    name: "getPixelCurrentPrice",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "pixelId",
+        type: "uint256",
+      },
+    ],
+    name: "getPixelPrice",
     outputs: [
       {
         internalType: "uint256",
@@ -309,29 +333,20 @@ export const PIXEL_CANVAS_ABI = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "x",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "y",
-        type: "uint256",
-      },
-      {
-        internalType: "string",
-        name: "text",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "link",
-        type: "string",
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
-    name: "purchasePixel",
-    outputs: [],
-    stateMutability: "payable",
+    name: "ownerPixelCount",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -356,6 +371,11 @@ export const PIXEL_CANVAS_ABI = [
       },
       {
         internalType: "string",
+        name: "imageUrl",
+        type: "string",
+      },
+      {
+        internalType: "string",
         name: "link",
         type: "string",
       },
@@ -366,11 +386,44 @@ export const PIXEL_CANVAS_ABI = [
       },
       {
         internalType: "uint256",
+        name: "purchaseCount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
         name: "purchaseTime",
         type: "uint256",
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "pixelId",
+        type: "uint256",
+      },
+      {
+        internalType: "string",
+        name: "text",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "imageUrl",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "link",
+        type: "string",
+      },
+    ],
+    name: "purchasePixel",
+    outputs: [],
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -390,17 +443,17 @@ export const PIXEL_CANVAS_ABI = [
     inputs: [
       {
         internalType: "uint256",
-        name: "x",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "y",
+        name: "pixelId",
         type: "uint256",
       },
       {
         internalType: "string",
         name: "text",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "imageUrl",
         type: "string",
       },
       {
@@ -427,7 +480,9 @@ export const PIXEL_CANVAS_ABI = [
 export interface PixelData {
   owner: string;
   text: string;
+  imageUrl: string;
   link: string;
   isOwned: boolean;
+  purchaseCount: bigint;
   purchaseTime: bigint;
 }
