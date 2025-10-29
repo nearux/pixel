@@ -48,6 +48,17 @@ export function usePurchasePixel() {
   };
 }
 
+export function useGetPixelPrice(pixelIndex: number) {
+  const { data: pixelPrice } = useReadContract({
+    address: PIXEL_BOARD_ADDRESS,
+    abi: PIXEL_BOARD_ABI,
+    functionName: "getPixelPrice",
+    args: [BigInt(pixelIndex)],
+  });
+
+  return pixelPrice ? Number(pixelPrice) : 0;
+}
+
 // 픽셀 업데이트 훅
 export function useUpdatePixel() {
   const { writeContract, data: hash, isPending, error } = useWriteContract();
@@ -126,12 +137,6 @@ export function useContractInfo() {
     functionName: "TOTAL_PIXELS",
   });
 
-  const { data: pixelPrice } = useReadContract({
-    address: PIXEL_BOARD_ADDRESS,
-    abi: PIXEL_BOARD_ABI,
-    functionName: "INITIAL_PIXEL_PRICE",
-  });
-
   const { data: totalPixelsSold } = useReadContract({
     address: PIXEL_BOARD_ADDRESS,
     abi: PIXEL_BOARD_ABI,
@@ -140,7 +145,6 @@ export function useContractInfo() {
 
   return {
     totalPixels: totalPixels ? Number(totalPixels) : 9,
-    pixelPrice: pixelPrice ? Number(pixelPrice) / 1e18 : 0.00000001, // Wei to ETH
     totalPixelsSold: totalPixelsSold ? Number(totalPixelsSold) : 0,
   };
 }

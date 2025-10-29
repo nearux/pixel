@@ -6,15 +6,15 @@ import { toast } from "@/shared/components/Toast/toastManager";
 import { useOverlay } from "@/shared/hooks/useOverlay";
 
 import { usePixelState } from "../hooks";
+import Pixel from "./Pixel";
 import { PixelPurchaseModal } from "./PixelPurchaseModal";
 
 export function PixelBoard() {
   const overlay = useOverlay();
   const { isConnected } = useAccount();
 
-  const { isLoading, refreshPixels, getPixel, CANVAS_SIZE } = usePixelState();
+  const { isLoading, refreshPixels, getPixel, pixels } = usePixelState();
 
-  // 픽셀 클릭 핸들러
   const handlePixelClick = (pixelIndex: number) => {
     const pixel = getPixel(pixelIndex);
 
@@ -50,40 +50,14 @@ export function PixelBoard() {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div className="overflow-auto p-4">
-        <div className="grid grid-cols-5 gap-2 w-fit mx-auto">
-          {Array.from({ length: CANVAS_SIZE * CANVAS_SIZE }, (_, index) => {
-            const pixel = getPixel(index);
-
-            return (
-              <div
-                key={`${x}-${y}`}
-                className={`
-                  aspect-square border-2 rounded-lg cursor-pointer transition-all duration-200
-                  hover:scale-105 hover:shadow-lg
-                  ${
-                    pixel?.isOwned
-                      ? "bg-yellow-100 border-yellow-400 hover:bg-yellow-200"
-                      : "bg-gray-100 border-gray-300 hover:bg-gray-200"
-                  }
-                `}
-                onClick={() => handlePixelClick(x, y)}
-              >
-                <div className="w-full h-full flex flex-col items-center justify-center p-2">
-                  {pixel?.isOwned ? (
-                    <div className="text-center">
-                      {pixel.text && (
-                        <div className="text-sm font-medium text-gray-800 mb-1">
-                          {pixel.text}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="text-xs text-gray-400"></div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-3 gap-2 w-fit mx-auto">
+          {pixels.map((pixel) => (
+            <Pixel
+              key={pixel.pixelIndex}
+              pixel={pixel}
+              onClick={handlePixelClick}
+            />
+          ))}
         </div>
       </div>
     </div>
