@@ -8,9 +8,15 @@ interface Props {
   pixel?: PixelType;
   isOwnedByCurrentUser: boolean;
   onClick: (pixelIndex: number) => void;
+  handlePixelPurchase: (pixelIndex: number) => void;
 }
 
-export const Pixel = ({ pixel, isOwnedByCurrentUser, onClick }: Props) => {
+export const Pixel = ({
+  pixel,
+  isOwnedByCurrentUser,
+  onClick,
+  handlePixelPurchase,
+}: Props) => {
   return (
     <div
       key={`${pixel?.pixelIndex}`}
@@ -25,13 +31,19 @@ export const Pixel = ({ pixel, isOwnedByCurrentUser, onClick }: Props) => {
             <Image
               src={`${pixel.imageUrl}`}
               alt={pixel.text}
-              width={100}
-              height={100}
+              width={140}
+              height={140}
               className="object-cover rounded"
             />
             {!isOwnedByCurrentUser && (
-              <span className="absolute bottom-2 right-2 text-xs font-medium text-white bg-black/60 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                Buy
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePixelPurchase(pixel?.pixelIndex ?? 0);
+                }}
+                className="absolute bottom-2 right-2 text-xs font-medium text-white bg-black/60 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+              >
+                Purchase
               </span>
             )}
           </>

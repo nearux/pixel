@@ -15,6 +15,22 @@ export function PixelBoard() {
 
   const { isLoading, refreshPixels, getPixel, pixels } = usePixelState();
 
+  const handlePixelPurchase = (pixelIndex: number) => {
+    if (!isConnected) {
+      toast.error("Please connect your wallet.");
+      return;
+    }
+
+    overlay.open(({ isOpen, close }) => (
+      <PixelPurchaseModal
+        isOpen={isOpen}
+        onClose={close}
+        pixelIndex={pixelIndex}
+        onSuccess={refreshPixels}
+      />
+    ));
+  };
+
   const handlePixelClick = (pixelIndex: number) => {
     const pixel = getPixel(pixelIndex);
 
@@ -23,19 +39,7 @@ export function PixelBoard() {
         window.open(pixel.link, "_blank");
       }
     } else {
-      if (!isConnected) {
-        toast.error("Please connect your wallet.");
-        return;
-      }
-
-      overlay.open(({ isOpen, close }) => (
-        <PixelPurchaseModal
-          isOpen={isOpen}
-          onClose={close}
-          pixelIndex={pixelIndex}
-          onSuccess={refreshPixels}
-        />
-      ));
+      handlePixelPurchase(pixelIndex);
     }
   };
 
@@ -59,6 +63,7 @@ export function PixelBoard() {
                 address?.toLowerCase() === pixel.owner?.toLowerCase()
               }
               onClick={handlePixelClick}
+              handlePixelPurchase={handlePixelPurchase}
             />
           ))}
         </div>
