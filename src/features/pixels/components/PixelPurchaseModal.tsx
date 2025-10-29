@@ -197,7 +197,7 @@ function PixelPurchaseModal({
                   !watch("link")
                 }
               >
-                {isPending ? "Processing..." : "Save changes"}
+                {isPending ? "Processing..." : "Purchase"}
               </Button>
             </DialogFooter>
           </form>
