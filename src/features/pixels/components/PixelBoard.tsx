@@ -11,7 +11,7 @@ import { PixelPurchaseModal } from "./PixelPurchaseModal";
 
 export function PixelBoard() {
   const overlay = useOverlay();
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
 
   const { isLoading, refreshPixels, getPixel, pixels } = usePixelState();
 
@@ -55,6 +55,9 @@ export function PixelBoard() {
             <Pixel
               key={pixel.pixelIndex}
               pixel={pixel}
+              isOwnedByCurrentUser={
+                address?.toLowerCase() === pixel.owner?.toLowerCase()
+              }
               onClick={handlePixelClick}
             />
           ))}
