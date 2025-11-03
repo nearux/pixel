@@ -5,11 +5,14 @@ import { FaUser } from "react-icons/fa";
 import { FiCopy } from "react-icons/fi";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
+import { useIsMounted } from "@/shared/hooks/useIsMounted";
+
 import { Button } from "./Button";
 import { toast } from "./Toast/toastManager";
 import { Tooltip, TooltipTrigger, TooltipContent } from "./Tooltip";
 
 export const ConnectButton = () => {
+  const isMounted = useIsMounted();
   const { address, isConnected } = useAccount();
   const { connectors, connect, isPending } = useConnect();
   const { disconnect } = useDisconnect();
@@ -24,6 +27,14 @@ export const ConnectButton = () => {
       }
     }
   };
+
+  if (!isMounted) {
+    return (
+      <div className="flex gap-2">
+        <Button disabled>Loading...</Button>
+      </div>
+    );
+  }
 
   if (isConnected && address) {
     return (
