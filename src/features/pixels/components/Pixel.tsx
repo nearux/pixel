@@ -30,12 +30,12 @@ export const Pixel = ({
       className={
         "group aspect-square border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg w-40 bg-gray-100 border-gray-300 hover:bg-gray-200"
       }
-      onClick={() => onClick(pixel.id, metadata?.link || "")}
+      onClick={() => onClick(pixel.id, metadata.link)}
     >
       <div className="w-full h-full flex flex-col items-center justify-center p-2 relative">
         <Image
           src={`${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${metadata.imageCid}`}
-          alt={metadata?.text || "Pixel image"}
+          alt={metadata.text || "Pixel image"}
           width={140}
           height={140}
           className="object-cover rounded"
