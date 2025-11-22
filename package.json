@@ -12,7 +12,7 @@
     "test": "hardhat test",
     "test:gas": "REPORT_GAS=true hardhat test",
     "coverage": "hardhat coverage",
-    "deploy:giwa": "hardhat ignition deploy ./ignition/modules/PixelBoard.ts --network giwaSepolia",
+    "deploy:giwa": "hardhat ignition deploy ./ignition/modules/PixelBoardV2.ts --network giwaSepolia",
     "verify:giwa": "hardhat verify --network giwaSepolia",
     "node": "hardhat node",
     "clean": "hardhat clean"
@@ -28,6 +28,7 @@
     "lucide-react": "^0.545.0",
     "mongodb": "^6.20.0",
     "next": "15.5.4",
+    "pinata": "^2.5.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-error-boundary": "^6.0.0",

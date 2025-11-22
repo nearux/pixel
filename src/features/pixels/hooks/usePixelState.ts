@@ -1,52 +1,14 @@
-import { useState, useEffect } from "react";
+import { type ContractPixel } from "@/shared/lib/contract";
 
 import { useAllPixels } from "./usePixelContract";
 
-export interface Pixel {
-  pixelIndex: number;
-  text: string;
-  imageUrl: string;
-  link: string;
-  owner: string;
-  isOwned: boolean;
-  purchaseTime: number;
-}
-
 export function usePixelState() {
-  const {
-    pixels: blockchainPixels,
-    isLoading,
-    error,
-    refetch,
-  } = useAllPixels();
-  const [localPixels, setLocalPixels] = useState<Pixel[]>([]);
+  const { pixels, isLoading, error, refetch } = useAllPixels();
 
-  useEffect(() => {
-    if (blockchainPixels) {
-      const convertedPixels: Pixel[] = [];
+  const getPixel = (pixelId: bigint): ContractPixel | undefined => {
+    if (!pixels) return undefined;
 
-      for (let x = 0; x < blockchainPixels.length; x++) {
-        const blockchainPixel = blockchainPixels[x];
-
-        convertedPixels.push({
-          pixelIndex: x,
-          text: blockchainPixel?.text || "",
-          imageUrl: blockchainPixel?.imageUrl || "",
-          link: blockchainPixel?.link || "",
-          owner: blockchainPixel?.owner || "",
-          isOwned: blockchainPixel?.isOwned || false,
-          purchaseTime: blockchainPixel?.purchaseTime
-            ? Number(blockchainPixel.purchaseTime)
-            : 0,
-        });
-      }
-
-      setLocalPixels(convertedPixels);
-    }
-  }, [blockchainPixels]);
-
-  const getPixel = (pixelIndex: number): Pixel | undefined => {
-    return localPixels.find((pixel) => pixel.pixelIndex === pixelIndex);
+    return pixels.find((pixel) => pixel.id === pixelId);
   };
 
   const refreshPixels = () => {
@@ -54,7 +16,7 @@ export function usePixelState() {
   };
 
   return {
-    pixels: localPixels,
+    pixels,
     isLoading,
     error,
     refreshPixels,

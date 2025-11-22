@@ -1,5 +1,7 @@
 "use client";
 
+import { Suspense } from "react";
+
 import { useAccount } from "wagmi";
 
 import { Button } from "@/shared/components/Button";
@@ -10,6 +12,7 @@ import { useOverlay } from "@/shared/hooks/useOverlay";
 import { usePixelState } from "../hooks";
 import Pixel from "./Pixel";
 import { PixelPurchaseModal } from "./PixelPurchaseModal";
+import { deleteMetadata } from "../api/deleteMetadata";
 
 import type { FallbackProps } from "react-error-boundary";
 
@@ -29,7 +32,7 @@ function PixelBoardContent() {
 
   const { isLoading, refreshPixels, getPixel, pixels } = usePixelState();
 
-  const handlePixelPurchase = (pixelIndex: number) => {
+  const handlePixelPurchase = (pixelId: bigint, metadataCid?: string) => {
     if (!isConnected) {
       toast.error("Please connect your wallet.");
       return;
@@ -39,21 +42,27 @@ function PixelBoardContent() {
       <PixelPurchaseModal
         isOpen={isOpen}
         onClose={close}
-        pixelIndex={pixelIndex}
-        onSuccess={refreshPixels}
+        pixelId={pixelId}
+        onSuccess={async () => {
+          refreshPixels();
+
+          if (metadataCid) {
+            deleteMetadata(metadataCid);
+          }
+        }}
       />
     ));
   };
 
-  const handlePixelClick = (pixelIndex: number) => {
-    const pixel = getPixel(pixelIndex);
+  const handlePixelClick = (pixelId: bigint, url?: string) => {
+    const pixel = getPixel(pixelId);
 
     if (pixel?.isOwned) {
-      if (pixel.link) {
-        window.open(pixel.link, "_blank");
+      if (pixel.metadataCid) {
+        window.open(url, "_blank");
       }
     } else {
-      handlePixelPurchase(pixelIndex);
+      handlePixelPurchase(pixelId);
     }
   };
 
@@ -69,17 +78,31 @@ function PixelBoardContent() {
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div className="overflow-auto p-4">
         <div className="grid grid-cols-3 gap-2 w-fit mx-auto">
-          {pixels.map((pixel) => (
-            <Pixel
-              key={pixel.pixelIndex}
-              pixel={pixel}
-              isOwnedByCurrentUser={
-                address?.toLowerCase() === pixel.owner?.toLowerCase()
-              }
-              onClick={handlePixelClick}
-              handlePixelPurchase={handlePixelPurchase}
-            />
-          ))}
+          {pixels?.map((pixel) =>
+            pixel.isOwned ? (
+              <ErrorBoundary
+                key={pixel.id}
+                errorFallback={(props) => <Pixel.ErrorFallback {...props} />}
+              >
+                <Suspense fallback={<Pixel.Fallback />}>
+                  <Pixel
+                    pixel={pixel}
+                    isOwnedByCurrentUser={
+                      address?.toLowerCase() === pixel.owner?.toLowerCase()
+                    }
+                    onClick={handlePixelClick}
+                    handlePixelPurchase={handlePixelPurchase}
+                  />
+                </Suspense>
+              </ErrorBoundary>
+            ) : (
+              <Pixel.Empty
+                key={pixel.id}
+                pixel={pixel}
+                onClick={handlePixelClick}
+              />
+            )
+          )}
         </div>
       </div>
     </div>

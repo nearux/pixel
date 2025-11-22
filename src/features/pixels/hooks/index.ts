@@ -1,11 +1,12 @@
 export { usePixelState } from "./usePixelState";
-export { useCanvasZoom } from "./useCanvasZoom";
-export { useInitCanvasDrawing } from "./useInitCanvasDrawing";
-export { useCanvasInteraction } from "./useCanvasInteraction";
 export {
   usePurchasePixel,
+  useGetPixelPrice,
   useUpdatePixel,
   usePixel,
   useAllPixels,
   useContractInfo,
 } from "./usePixelContract";
+export { usePixelMetadata } from "./usePixelMetadata";
+export { useTransactionNotify } from "./useTransactionNotify";
+export { useImagePreview } from "./useImagePreview";
