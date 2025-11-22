@@ -418,13 +418,9 @@ export const PIXEL_BOARD_V2_ABI = [
 
 export interface ContractPixel {
   id: bigint;
-  owner: string;
+  owner: `0x${string}`;
   metadataCid: string;
   isOwned: boolean;
   purchaseCount: bigint;
   purchaseTime: bigint;
-}
-
-export interface Pixel extends Omit<ContractPixel, "id" | "purchaseCount"> {
-  pixelIndex: number;
 }
