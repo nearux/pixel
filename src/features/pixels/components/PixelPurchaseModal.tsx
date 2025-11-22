@@ -90,7 +90,7 @@ function PixelPurchaseModal({
 
     setNotifyType("uploading");
 
-    const { metadataCid } = await fetch("/api/files", {
+    const { metadataCid, imageId, metadataId } = await fetch("/api/files", {
       method: "POST",
       body: formData,
     }).then((res) => res.json());
@@ -105,6 +105,14 @@ function PixelPurchaseModal({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_) {
       toast.error("Pixel purchase failed");
+
+      await fetch("/api/files", {
+        method: "DELETE",
+        body: JSON.stringify({ ids: [metadataId, imageId] }),
+      });
+
+      toast.success("Delete upload files!");
+
       setNotifyType(null);
     }
   };

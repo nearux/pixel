@@ -12,7 +12,12 @@ const PIXEL_BOARD_ADDRESS = process.env
 
 // 픽셀 구매 훅
 export function usePurchasePixel() {
-  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const {
+    writeContractAsync,
+    data: hash,
+    isPending,
+    error,
+  } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({
@@ -32,13 +37,15 @@ export function usePurchasePixel() {
       throw new Error("Metadata CID is required");
     }
 
-    writeContract({
+    const hash = await writeContractAsync({
       address: PIXEL_BOARD_ADDRESS,
       abi: PIXEL_BOARD_V2_ABI,
       functionName: "purchasePixel",
       args: [pixelId, metadataCid],
       value: parseEther(price),
     });
+
+    return hash;
   };
 
   return {

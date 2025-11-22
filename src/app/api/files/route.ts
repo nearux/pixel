@@ -12,12 +12,14 @@ export async function POST(request: NextRequest) {
     const imageFile = formData.get("image")! as File;
 
     const fileExtension = imageFile.name.split(".").pop() || "png";
-    const fileName = `${pixelId}_lasted.${fileExtension}`;
+    const fileName = `${pixelId}_${Date.now()}.${fileExtension}`;
     const renamedFile = new File([imageFile], fileName, {
       type: imageFile.type,
     });
 
-    const { cid: imageCid } = await pinata.upload.public.file(renamedFile);
+    const { id: imageId, cid: imageCid } = await pinata.upload.public.file(
+      renamedFile
+    );
 
     const metadata = {
       text: title,
@@ -29,15 +31,43 @@ export async function POST(request: NextRequest) {
       type: "application/json",
     });
 
-    const metadataFile = new File([metadataBlob], `${pixelId}_metadata.json`);
-    const { cid: metadataCid } = await pinata.upload.public.file(metadataFile);
+    const metadataFile = new File(
+      [metadataBlob],
+      `${pixelId}_${Date.now()}_metadata.json`
+    );
+    const { id: metadataId, cid: metadataCid } =
+      await pinata.upload.public.file(metadataFile);
 
     return NextResponse.json(
-      { metadataCid: metadataCid.toString() },
+      {
+        metadataCid: metadataCid.toString(),
+        // 삭제할 때 사용
+        metadataId: metadataId.toString(),
+        imageId: imageId.toString(),
+      },
       { status: 200 }
     );
   } catch (e) {
     console.error("Error uploading to Pinata:", e);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { ids } = await request.json();
+
+    await pinata.files.public.delete([...ids]);
+
+    return NextResponse.json(
+      { message: "Files deleted successfully" },
+      { status: 200 }
+    );
+  } catch (e) {
+    console.error("Error deleting from Pinata:", e);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
