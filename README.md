@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pixel Board
 
-## Getting Started
+A decentralized pixel ownership platform built on the GIWA blockchain network. Users can purchase, own, and customize pixels with images, titles, and links.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Pixel Purchase System**: Buy pixels on a 3x3 grid with a dynamic pricing mechanism (price doubles with each purchase)
+- **IPFS Storage**: Images and metadata are stored on IPFS via Pinata, with only CIDs stored on-chain for gas efficiency
+- **Ownership Management**: Track pixel ownership, purchase history, and update pixel content
+- **Web3 Integration**: Built with wagmi and viem for seamless blockchain interactions
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How It Works
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Users connect their wallet and browse available pixels
+2. Click on any pixel (empty or owned) to purchase it
+3. Upload an image, add a title and link
+4. Image and metadata are uploaded to IPFS
+5. Transaction is confirmed on GIWA network
+6. Pixel ownership is recorded on-chain with IPFS CID
+7. **Dynamic Pricing**: Each pixel can be repurchased by anyone, with the price doubling after each purchase (e.g., 0.00000001 ETH → 0.00000002 ETH → 0.00000004 ETH...)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Upcoming Features
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Progressive UI Enhancement**: Pixel visual effects and styling will become more sophisticated based on the number of transactions (purchaseCount), creating a visual progression system that rewards frequently traded pixels.
