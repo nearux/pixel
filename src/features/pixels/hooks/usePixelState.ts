@@ -13,7 +13,12 @@ export interface Pixel {
 }
 
 export function usePixelState() {
-  const { pixels: blockchainPixels, isLoading, refetch } = useAllPixels();
+  const {
+    pixels: blockchainPixels,
+    isLoading,
+    error,
+    refetch,
+  } = useAllPixels();
   const [localPixels, setLocalPixels] = useState<Pixel[]>([]);
 
   useEffect(() => {
@@ -51,6 +56,7 @@ export function usePixelState() {
   return {
     pixels: localPixels,
     isLoading,
+    error,
     refreshPixels,
     getPixel,
   };

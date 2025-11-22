@@ -2,12 +2,15 @@
 
 import { useAccount } from "wagmi";
 
+import { Button } from "@/shared/components/Button";
 import { toast } from "@/shared/components/Toast/toastManager";
 import { useOverlay } from "@/shared/hooks/useOverlay";
 
 import { usePixelState } from "../hooks";
 import Pixel from "./Pixel";
 import { PixelPurchaseModal } from "./PixelPurchaseModal";
+
+import type { FallbackProps } from "react-error-boundary";
 
 export function PixelBoard() {
   const overlay = useOverlay();
@@ -71,3 +74,14 @@ export function PixelBoard() {
     </div>
   );
 }
+
+PixelBoard.ErrorFallback = ({ resetErrorBoundary }: FallbackProps) => {
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+      <div className="text-red-500 text-center">
+        <p className="font-bold mb-2">Failed to load pixel data</p>
+      </div>
+      <Button onClick={() => resetErrorBoundary()}>Retry</Button>
+    </div>
+  );
+};

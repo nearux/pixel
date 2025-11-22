@@ -61,6 +61,7 @@ export function useGetPixelPrice(pixelIndex: number) {
     abi: PIXEL_BOARD_ABI,
     functionName: "getPixelPrice",
     args: [BigInt(pixelIndex)],
+    chainId: 91342,
   });
 
   return pixelPrice ? Number(pixelPrice) : 0;
@@ -110,6 +111,7 @@ export function usePixel(pixelIndex: number) {
     abi: PIXEL_BOARD_ABI,
     functionName: "getPixel",
     args: [BigInt(pixelIndex)],
+    chainId: 91342,
   });
 
   return {
@@ -126,6 +128,7 @@ export function useAllPixels() {
     address: PIXEL_BOARD_ADDRESS,
     abi: PIXEL_BOARD_ABI,
     functionName: "getAllPixels",
+    chainId: 91342,
   });
 
   return {
@@ -142,12 +145,14 @@ export function useContractInfo() {
     address: PIXEL_BOARD_ADDRESS,
     abi: PIXEL_BOARD_ABI,
     functionName: "TOTAL_PIXELS",
+    chainId: 91342,
   });
 
   const { data: totalPixelsSold } = useReadContract({
     address: PIXEL_BOARD_ADDRESS,
     abi: PIXEL_BOARD_ABI,
     functionName: "totalPixelsSold",
+    chainId: 91342,
   });
 
   return {
