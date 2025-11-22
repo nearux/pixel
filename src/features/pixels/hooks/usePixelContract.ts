@@ -43,6 +43,7 @@ export function usePurchasePixel() {
 
   return {
     purchasePixel,
+    isConfirming,
     isPending: isPending || isConfirming,
     isSuccess: isConfirmed,
     error,

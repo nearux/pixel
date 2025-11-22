@@ -13,11 +13,16 @@ import {
   DialogTitle,
 } from "@/shared/components/Dialog";
 import { Input } from "@/shared/components/Input";
+import { toast } from "@/shared/components/Toast/toastManager";
 import { weiToEther } from "@/shared/utils/weiToEther";
 
 import { ImagePreview } from "./ImagePreview";
-import { useImagePreview } from "../hooks/useImagePreview";
-import { useGetPixelPrice, usePurchasePixel } from "../hooks/usePixelContract";
+import {
+  useGetPixelPrice,
+  usePurchasePixel,
+  useImagePreview,
+  useTransactionNotify,
+} from "../hooks";
 
 interface PixelPurchaseModalProps {
   isOpen: boolean;
@@ -39,7 +44,12 @@ function PixelPurchaseModal({
   onSuccess,
 }: PixelPurchaseModalProps) {
   const pixelPrice = useGetPixelPrice(pixelId);
-  const { purchasePixel, isPending, isSuccess } = usePurchasePixel();
+  const { purchasePixel, isPending, isSuccess, error } = usePurchasePixel();
+  const { isProcessingPurchase, notifyMessage, setNotifyType } =
+    useTransactionNotify({
+      isPending,
+      error,
+    });
 
   const pixelPriceInEther = weiToEther(pixelPrice);
 
@@ -57,16 +67,14 @@ function PixelPurchaseModal({
   });
 
   useEffect(() => {
-    if (!isOpen) {
-      reset();
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
     if (isSuccess) {
-      onSuccess?.();
+      toast.success("Pixel purchased successfully");
+
       reset();
       onClose();
+      setNotifyType(null);
+
+      onSuccess?.();
     }
   }, [isSuccess]);
 
@@ -80,6 +88,8 @@ function PixelPurchaseModal({
     formData.append("pixelId", pixelId.toString());
     formData.append("image", imageFile![0]);
 
+    setNotifyType("uploading");
+
     const { metadataCid } = await fetch("/api/files", {
       method: "POST",
       body: formData,
@@ -92,9 +102,10 @@ function PixelPurchaseModal({
         metadataCid,
       });
 
-      onSuccess?.();
-    } catch (err) {
-      console.error("Purchase failed:", err);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_) {
+      toast.error("Pixel purchase failed");
+      setNotifyType(null);
     }
   };
 
@@ -102,7 +113,15 @@ function PixelPurchaseModal({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog
+        open={isOpen}
+        onOpenChange={() => {
+          if (!isProcessingPurchase) {
+            reset();
+            onClose();
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-[425px]">
           <form
             className="flex flex-col gap-4"
@@ -158,6 +177,7 @@ function PixelPurchaseModal({
                 <Input
                   type="text"
                   placeholder="Hello, World"
+                  disabled={isProcessingPurchase}
                   {...register("title")}
                 />
               </div>
@@ -166,6 +186,7 @@ function PixelPurchaseModal({
                 <Input
                   type="url"
                   placeholder="https://example.com"
+                  disabled={isProcessingPurchase}
                   {...register("link")}
                 />
               </div>
@@ -178,6 +199,7 @@ function PixelPurchaseModal({
                 type="submit"
                 disabled={
                   isPending ||
+                  isProcessingPurchase ||
                   !watch("imageFile") ||
                   !watch("title") ||
                   !watch("link")
@@ -189,6 +211,11 @@ function PixelPurchaseModal({
           </form>
         </DialogContent>
       </Dialog>
+      {notifyMessage && (
+        <div className="fixed top-0 left-0 w-screen h-screen bg-black/50 flex items-center justify-center z-100">
+          <div className="text-white text-2xl font-bold">{notifyMessage}</div>
+        </div>
+      )}
     </>
   );
 }
