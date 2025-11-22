@@ -6,7 +6,9 @@ export interface PixelMetadata {
   imageCid: string;
 }
 
-async function fetchMetadata(metadataCid: string): Promise<PixelMetadata> {
+export async function fetchMetadata(
+  metadataCid: string
+): Promise<PixelMetadata> {
   const url = `${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${metadataCid}`;
   const response = await fetch(url);
 

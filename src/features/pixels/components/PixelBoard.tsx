@@ -12,6 +12,7 @@ import { useOverlay } from "@/shared/hooks/useOverlay";
 import { usePixelState } from "../hooks";
 import Pixel from "./Pixel";
 import { PixelPurchaseModal } from "./PixelPurchaseModal";
+import { deleteMetadata } from "../api/deleteMetadata";
 
 import type { FallbackProps } from "react-error-boundary";
 
@@ -31,7 +32,7 @@ function PixelBoardContent() {
 
   const { isLoading, refreshPixels, getPixel, pixels } = usePixelState();
 
-  const handlePixelPurchase = (pixelId: bigint) => {
+  const handlePixelPurchase = (pixelId: bigint, metadataCid?: string) => {
     if (!isConnected) {
       toast.error("Please connect your wallet.");
       return;
@@ -42,7 +43,13 @@ function PixelBoardContent() {
         isOpen={isOpen}
         onClose={close}
         pixelId={pixelId}
-        onSuccess={refreshPixels}
+        onSuccess={async () => {
+          refreshPixels();
+
+          if (metadataCid) {
+            deleteMetadata(metadataCid);
+          }
+        }}
       />
     ));
   };
@@ -72,7 +79,7 @@ function PixelBoardContent() {
       <div className="overflow-auto p-4">
         <div className="grid grid-cols-3 gap-2 w-fit mx-auto">
           {pixels?.map((pixel) =>
-            pixel.metadataCid ? (
+            pixel.isOwned ? (
               <ErrorBoundary
                 key={pixel.id}
                 errorFallback={(props) => <Pixel.ErrorFallback {...props} />}

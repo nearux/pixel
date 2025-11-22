@@ -13,7 +13,7 @@ interface Props {
   pixel: ContractPixel;
   isOwnedByCurrentUser: boolean;
   onClick: (pixelId: bigint, url: string) => void;
-  handlePixelPurchase: (pixelId: bigint) => void;
+  handlePixelPurchase: (pixelId: bigint, metadataCid: string) => void;
 }
 
 export const Pixel = ({
@@ -44,7 +44,7 @@ export const Pixel = ({
           <span
             onClick={(e) => {
               e.stopPropagation();
-              handlePixelPurchase(pixel.id);
+              handlePixelPurchase(pixel.id, pixel.metadataCid);
             }}
             className="absolute bottom-2 right-2 text-xs font-medium text-white bg-black/60 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
           >

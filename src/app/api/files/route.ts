@@ -17,9 +17,7 @@ export async function POST(request: NextRequest) {
       type: imageFile.type,
     });
 
-    const { id: imageId, cid: imageCid } = await pinata.upload.public.file(
-      renamedFile
-    );
+    const { cid: imageCid } = await pinata.upload.public.file(renamedFile);
 
     const metadata = {
       text: title,
@@ -35,15 +33,12 @@ export async function POST(request: NextRequest) {
       [metadataBlob],
       `${pixelId}_${Date.now()}_metadata.json`
     );
-    const { id: metadataId, cid: metadataCid } =
-      await pinata.upload.public.file(metadataFile);
+
+    const { cid: metadataCid } = await pinata.upload.public.file(metadataFile);
 
     return NextResponse.json(
       {
         metadataCid: metadataCid.toString(),
-        // 삭제할 때 사용
-        metadataId: metadataId.toString(),
-        imageId: imageId.toString(),
       },
       { status: 200 }
     );
@@ -58,9 +53,15 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { ids } = await request.json();
+    const { cids } = await request.json();
 
-    await pinata.files.public.delete([...ids]);
+    const files = await pinata.files.public.list();
+
+    const filterIds = files.files
+      .filter((file) => cids.includes(file.cid))
+      .map((file) => file.id);
+
+    await pinata.files.public.delete([...filterIds]);
 
     return NextResponse.json(
       { message: "Files deleted successfully" },

@@ -17,6 +17,7 @@ import { toast } from "@/shared/components/Toast/toastManager";
 import { weiToEther } from "@/shared/utils/weiToEther";
 
 import { ImagePreview } from "./ImagePreview";
+import { deleteMetadata } from "../api/deleteMetadata";
 import {
   useGetPixelPrice,
   usePurchasePixel,
@@ -90,7 +91,7 @@ function PixelPurchaseModal({
 
     setNotifyType("uploading");
 
-    const { metadataCid, imageId, metadataId } = await fetch("/api/files", {
+    const { metadataCid } = await fetch("/api/files", {
       method: "POST",
       body: formData,
     }).then((res) => res.json());
@@ -106,10 +107,7 @@ function PixelPurchaseModal({
     } catch (_) {
       toast.error("Pixel purchase failed");
 
-      await fetch("/api/files", {
-        method: "DELETE",
-        body: JSON.stringify({ ids: [metadataId, imageId] }),
-      });
+      await deleteMetadata(metadataCid);
 
       toast.success("Delete upload files!");
 
