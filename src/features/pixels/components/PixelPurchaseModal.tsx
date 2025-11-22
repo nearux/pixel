@@ -22,7 +22,7 @@ import { useGetPixelPrice, usePurchasePixel } from "../hooks/usePixelContract";
 interface PixelPurchaseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  pixelIndex: number;
+  pixelId: bigint;
   onSuccess?: () => void;
 }
 
@@ -35,10 +35,10 @@ export type PixelForm = {
 function PixelPurchaseModal({
   isOpen,
   onClose,
-  pixelIndex,
+  pixelId,
   onSuccess,
 }: PixelPurchaseModalProps) {
-  const pixelPrice = useGetPixelPrice(pixelIndex);
+  const pixelPrice = useGetPixelPrice(pixelId);
   const { purchasePixel, isPending, isSuccess } = usePurchasePixel();
 
   const pixelPriceInEther = weiToEther(pixelPrice);
@@ -77,7 +77,7 @@ function PixelPurchaseModal({
 
     formData.append("title", title);
     formData.append("link", link);
-    formData.append("pixelIndex", pixelIndex.toString());
+    formData.append("pixelId", pixelId.toString());
     formData.append("image", imageFile![0]);
 
     const { metadataCid } = await fetch("/api/files", {
@@ -88,7 +88,7 @@ function PixelPurchaseModal({
     try {
       await purchasePixel({
         price: pixelPriceInEther,
-        pixelIndex,
+        pixelId: pixelId,
         metadataCid,
       });
 

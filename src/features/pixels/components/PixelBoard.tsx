@@ -31,7 +31,7 @@ function PixelBoardContent() {
 
   const { isLoading, refreshPixels, getPixel, pixels } = usePixelState();
 
-  const handlePixelPurchase = (pixelIndex: number) => {
+  const handlePixelPurchase = (pixelId: bigint) => {
     if (!isConnected) {
       toast.error("Please connect your wallet.");
       return;
@@ -41,21 +41,21 @@ function PixelBoardContent() {
       <PixelPurchaseModal
         isOpen={isOpen}
         onClose={close}
-        pixelIndex={pixelIndex}
+        pixelId={pixelId}
         onSuccess={refreshPixels}
       />
     ));
   };
 
-  const handlePixelClick = (pixelIndex: number, url?: string) => {
-    const pixel = getPixel(pixelIndex);
+  const handlePixelClick = (pixelId: bigint, url?: string) => {
+    const pixel = getPixel(pixelId);
 
     if (pixel?.isOwned) {
       if (pixel.metadataCid) {
         window.open(url, "_blank");
       }
     } else {
-      handlePixelPurchase(pixelIndex);
+      handlePixelPurchase(pixelId);
     }
   };
 
@@ -71,10 +71,10 @@ function PixelBoardContent() {
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div className="overflow-auto p-4">
         <div className="grid grid-cols-3 gap-2 w-fit mx-auto">
-          {pixels.map((pixel) =>
+          {pixels?.map((pixel) =>
             pixel.metadataCid ? (
               <ErrorBoundary
-                key={pixel.pixelIndex}
+                key={pixel.id}
                 errorFallback={(props) => <Pixel.ErrorFallback {...props} />}
               >
                 <Suspense fallback={<Pixel.Fallback />}>
@@ -90,7 +90,7 @@ function PixelBoardContent() {
               </ErrorBoundary>
             ) : (
               <Pixel.Empty
-                key={pixel.pixelIndex}
+                key={pixel.id}
                 pixel={pixel}
                 onClick={handlePixelClick}
               />

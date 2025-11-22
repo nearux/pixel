@@ -8,11 +8,11 @@ export async function POST(request: NextRequest) {
 
     const title = formData.get("title") as string;
     const link = formData.get("link") as string;
-    const pixelIndex = formData.get("pixelIndex") as string;
+    const pixelId = formData.get("pixelId") as string;
     const imageFile = formData.get("image")! as File;
 
     const fileExtension = imageFile.name.split(".").pop() || "png";
-    const fileName = `${pixelIndex}_lasted.${fileExtension}`;
+    const fileName = `${pixelId}_lasted.${fileExtension}`;
     const renamedFile = new File([imageFile], fileName, {
       type: imageFile.type,
     });
@@ -29,10 +29,7 @@ export async function POST(request: NextRequest) {
       type: "application/json",
     });
 
-    const metadataFile = new File(
-      [metadataBlob],
-      `${pixelIndex}_metadata.json`
-    );
+    const metadataFile = new File([metadataBlob], `${pixelId}_metadata.json`);
     const { cid: metadataCid } = await pinata.upload.public.file(metadataFile);
 
     return NextResponse.json(

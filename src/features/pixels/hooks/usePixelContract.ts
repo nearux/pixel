@@ -5,7 +5,7 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 
-import { PIXEL_BOARD_V2_ABI, type ContractPixel } from "@/shared/lib/contract";
+import { PIXEL_BOARD_V2_ABI } from "@/shared/lib/contract";
 
 const PIXEL_BOARD_ADDRESS = process.env
   .NEXT_PUBLIC_PIXEL_BOARD_V2_ADDRESS as `0x${string}`;
@@ -20,11 +20,11 @@ export function usePurchasePixel() {
     });
 
   const purchasePixel = async ({
-    pixelIndex,
+    pixelId,
     metadataCid,
     price,
   }: {
-    pixelIndex: number;
+    pixelId: bigint;
     metadataCid: string;
     price: string;
   }) => {
@@ -36,7 +36,7 @@ export function usePurchasePixel() {
       address: PIXEL_BOARD_ADDRESS,
       abi: PIXEL_BOARD_V2_ABI,
       functionName: "purchasePixel",
-      args: [BigInt(pixelIndex), metadataCid],
+      args: [pixelId, metadataCid],
       value: parseEther(price),
     });
   };
@@ -50,12 +50,12 @@ export function usePurchasePixel() {
   };
 }
 
-export function useGetPixelPrice(pixelIndex: number) {
+export function useGetPixelPrice(pixelId: bigint) {
   const { data: pixelPrice } = useReadContract({
     address: PIXEL_BOARD_ADDRESS,
     abi: PIXEL_BOARD_V2_ABI,
     functionName: "getPixelPrice",
-    args: [BigInt(pixelIndex)],
+    args: [pixelId],
     chainId: 91342,
   });
 
@@ -71,13 +71,13 @@ export function useUpdatePixel() {
       hash,
     });
 
-  const updatePixel = async (pixelIndex: number, metadataCid: string) => {
+  const updatePixel = async (pixelId: number, metadataCid: string) => {
     try {
       await writeContract({
         address: PIXEL_BOARD_ADDRESS,
         abi: PIXEL_BOARD_V2_ABI,
         functionName: "updatePixel",
-        args: [BigInt(pixelIndex), metadataCid],
+        args: [BigInt(pixelId), metadataCid],
         chainId: 91342,
       });
     } catch (err) {
@@ -96,17 +96,22 @@ export function useUpdatePixel() {
 }
 
 // 특정 픽셀 조회 훅
-export function usePixel(pixelIndex: number) {
-  const { data, isLoading, error, refetch } = useReadContract({
+export function usePixel(pixelId: bigint) {
+  const {
+    data: pixel,
+    isLoading,
+    error,
+    refetch,
+  } = useReadContract({
     address: PIXEL_BOARD_ADDRESS,
     abi: PIXEL_BOARD_V2_ABI,
     functionName: "getPixel",
-    args: [BigInt(pixelIndex)],
+    args: [pixelId],
     chainId: 91342,
   });
 
   return {
-    pixel: data as ContractPixel | undefined,
+    pixel,
     isLoading,
     error,
     refetch,
@@ -115,7 +120,12 @@ export function usePixel(pixelIndex: number) {
 
 // 모든 픽셀 조회 훅
 export function useAllPixels() {
-  const { data, isLoading, error, refetch } = useReadContract({
+  const {
+    data: pixels,
+    isLoading,
+    error,
+    refetch,
+  } = useReadContract({
     address: PIXEL_BOARD_ADDRESS,
     abi: PIXEL_BOARD_V2_ABI,
     functionName: "getAllPixels",
@@ -123,7 +133,7 @@ export function useAllPixels() {
   });
 
   return {
-    pixels: data as ContractPixel[] | undefined,
+    pixels,
     isLoading,
     error,
     refetch,

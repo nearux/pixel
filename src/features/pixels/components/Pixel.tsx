@@ -5,15 +5,15 @@ import Image from "next/image";
 import { FallbackProps } from "react-error-boundary";
 
 import { Button } from "@/shared/components/Button";
-import { type Pixel as PixelType } from "@/shared/lib/contract";
+import { ContractPixel } from "@/shared/lib/contract";
 
 import { usePixelMetadata } from "../hooks";
 
 interface Props {
-  pixel: PixelType;
+  pixel: ContractPixel;
   isOwnedByCurrentUser: boolean;
-  onClick: (pixelIndex: number, url: string) => void;
-  handlePixelPurchase: (pixelIndex: number) => void;
+  onClick: (pixelId: bigint, url: string) => void;
+  handlePixelPurchase: (pixelId: bigint) => void;
 }
 
 export const Pixel = ({
@@ -26,11 +26,11 @@ export const Pixel = ({
 
   return (
     <div
-      key={`${pixel.pixelIndex}`}
+      key={`${pixel.id}`}
       className={
         "group aspect-square border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg w-40 bg-gray-100 border-gray-300 hover:bg-gray-200"
       }
-      onClick={() => onClick(pixel.pixelIndex, metadata?.link || "")}
+      onClick={() => onClick(pixel.id, metadata?.link || "")}
     >
       <div className="w-full h-full flex flex-col items-center justify-center p-2 relative">
         <Image
@@ -44,7 +44,7 @@ export const Pixel = ({
           <span
             onClick={(e) => {
               e.stopPropagation();
-              handlePixelPurchase(pixel.pixelIndex);
+              handlePixelPurchase(pixel.id);
             }}
             className="absolute bottom-2 right-2 text-xs font-medium text-white bg-black/60 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
           >
@@ -86,16 +86,16 @@ Pixel.Empty = ({
   pixel,
   onClick,
 }: {
-  pixel: PixelType;
-  onClick: (pixelIndex: number, url?: string) => void;
+  pixel: ContractPixel;
+  onClick: (pixelId: bigint, url?: string) => void;
 }) => {
   return (
     <div
-      key={`${pixel.pixelIndex}`}
+      key={`${pixel.id}`}
       className={
         "group aspect-square border-2 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg w-40 bg-gray-100 border-gray-300 hover:bg-gray-200"
       }
-      onClick={() => onClick(pixel.pixelIndex)}
+      onClick={() => onClick(pixel.id)}
     >
       <div className="w-full h-full flex flex-col items-center justify-center p-2 relative">
         <div className="text-xs text-gray-400" />
