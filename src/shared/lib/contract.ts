@@ -1,5 +1,4 @@
-// PixelBoard 컨트랙트 ABI
-export const PIXEL_BOARD_ABI = [
+export const PIXEL_BOARD_V2_ABI = [
   {
     inputs: [],
     stateMutability: "nonpayable",
@@ -7,7 +6,7 @@ export const PIXEL_BOARD_ABI = [
   },
   {
     inputs: [],
-    name: "EmptyText",
+    name: "EmptyMetadataCid",
     type: "error",
   },
   {
@@ -66,19 +65,7 @@ export const PIXEL_BOARD_ABI = [
       {
         indexed: false,
         internalType: "string",
-        name: "text",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "imageUrl",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "link",
+        name: "metadataCid",
         type: "string",
       },
       {
@@ -115,19 +102,7 @@ export const PIXEL_BOARD_ABI = [
       {
         indexed: false,
         internalType: "string",
-        name: "text",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "imageUrl",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "link",
+        name: "metadataCid",
         type: "string",
       },
     ],
@@ -167,23 +142,18 @@ export const PIXEL_BOARD_ABI = [
       {
         components: [
           {
+            internalType: "uint256",
+            name: "id",
+            type: "uint256",
+          },
+          {
             internalType: "address",
             name: "owner",
             type: "address",
           },
           {
             internalType: "string",
-            name: "text",
-            type: "string",
-          },
-          {
-            internalType: "string",
-            name: "imageUrl",
-            type: "string",
-          },
-          {
-            internalType: "string",
-            name: "link",
+            name: "metadataCid",
             type: "string",
           },
           {
@@ -202,7 +172,7 @@ export const PIXEL_BOARD_ABI = [
             type: "uint256",
           },
         ],
-        internalType: "struct PixelBoard.Pixel[]",
+        internalType: "struct PixelBoardV2.Pixel[]",
         name: "",
         type: "tuple[]",
       },
@@ -236,23 +206,18 @@ export const PIXEL_BOARD_ABI = [
       {
         components: [
           {
+            internalType: "uint256",
+            name: "id",
+            type: "uint256",
+          },
+          {
             internalType: "address",
             name: "owner",
             type: "address",
           },
           {
             internalType: "string",
-            name: "text",
-            type: "string",
-          },
-          {
-            internalType: "string",
-            name: "imageUrl",
-            type: "string",
-          },
-          {
-            internalType: "string",
-            name: "link",
+            name: "metadataCid",
             type: "string",
           },
           {
@@ -271,7 +236,7 @@ export const PIXEL_BOARD_ABI = [
             type: "uint256",
           },
         ],
-        internalType: "struct PixelBoard.Pixel",
+        internalType: "struct PixelBoardV2.Pixel",
         name: "",
         type: "tuple",
       },
@@ -360,23 +325,18 @@ export const PIXEL_BOARD_ABI = [
     name: "pixels",
     outputs: [
       {
+        internalType: "uint256",
+        name: "id",
+        type: "uint256",
+      },
+      {
         internalType: "address",
         name: "owner",
         type: "address",
       },
       {
         internalType: "string",
-        name: "text",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "imageUrl",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "link",
+        name: "metadataCid",
         type: "string",
       },
       {
@@ -407,17 +367,7 @@ export const PIXEL_BOARD_ABI = [
       },
       {
         internalType: "string",
-        name: "text",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "imageUrl",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "link",
+        name: "metadataCid",
         type: "string",
       },
     ],
@@ -448,17 +398,7 @@ export const PIXEL_BOARD_ABI = [
       },
       {
         internalType: "string",
-        name: "text",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "imageUrl",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "link",
+        name: "metadataCid",
         type: "string",
       },
     ],
@@ -476,13 +416,15 @@ export const PIXEL_BOARD_ABI = [
   },
 ] as const;
 
-// 픽셀 데이터 타입
-export interface PixelData {
+export interface ContractPixel {
+  id: bigint;
   owner: string;
-  text: string;
-  imageUrl: string;
-  link: string;
+  metadataCid: string;
   isOwned: boolean;
   purchaseCount: bigint;
   purchaseTime: bigint;
+}
+
+export interface Pixel extends Omit<ContractPixel, "id" | "purchaseCount"> {
+  pixelIndex: number;
 }
