@@ -9,3 +9,4 @@ export {
   useAllPixels,
   useContractInfo,
 } from "./usePixelContract";
+export { usePixelMetadata } from "./usePixelMetadata";

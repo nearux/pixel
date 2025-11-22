@@ -7,7 +7,7 @@ import { FallbackProps } from "react-error-boundary";
 import { Button } from "@/shared/components/Button";
 import { type Pixel as PixelType } from "@/shared/lib/contract";
 
-import { usePixelMetadata } from "../hooks/usePixelMetadata";
+import { usePixelMetadata } from "../hooks";
 
 interface Props {
   pixel: PixelType;
