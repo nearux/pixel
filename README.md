@@ -1,5 +1,8 @@
 # Pixel Board
 
+
+<img width="1624" height="1285" alt="image" src="https://github.com/user-attachments/assets/2c5abb63-1d08-42c6-9463-ccdcb4336106" />
+
 A decentralized pixel ownership platform built on the GIWA blockchain network. Users can purchase, own, and customize pixels with images, titles, and links.
 
 ## Features
