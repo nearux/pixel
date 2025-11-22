@@ -3,6 +3,7 @@
 import { useAccount } from "wagmi";
 
 import { Button } from "@/shared/components/Button";
+import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
 import { toast } from "@/shared/components/Toast/toastManager";
 import { useOverlay } from "@/shared/hooks/useOverlay";
 
@@ -13,6 +14,16 @@ import { PixelPurchaseModal } from "./PixelPurchaseModal";
 import type { FallbackProps } from "react-error-boundary";
 
 export function PixelBoard() {
+  return (
+    <ErrorBoundary
+      errorFallback={(props) => <PixelBoardContent.ErrorFallback {...props} />}
+    >
+      <PixelBoardContent />
+    </ErrorBoundary>
+  );
+}
+
+function PixelBoardContent() {
   const overlay = useOverlay();
   const { isConnected, address } = useAccount();
 
@@ -75,7 +86,7 @@ export function PixelBoard() {
   );
 }
 
-PixelBoard.ErrorFallback = ({ resetErrorBoundary }: FallbackProps) => {
+PixelBoardContent.ErrorFallback = ({ resetErrorBoundary }: FallbackProps) => {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center gap-4">
       <div className="text-red-500 text-center">
