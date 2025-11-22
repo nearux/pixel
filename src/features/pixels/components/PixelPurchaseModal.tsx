@@ -70,40 +70,26 @@ function PixelPurchaseModal({
     }
   }, [isSuccess]);
 
-  const uploadImage = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("image", file);
-
-    const response = await fetch("/api/upload-image", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to upload image");
-    }
-
-    const data = await response.json();
-    return data.imageUrl;
-  };
-
   const onSubmit = async (form: PixelForm) => {
     const { title, link, imageFile } = form;
 
-    let imageUrl = "";
+    const formData = new FormData();
 
-    if (imageFile) {
-      imageUrl = await uploadImage(imageFile[0]);
-    }
+    formData.append("title", title);
+    formData.append("link", link);
+    formData.append("pixelIndex", pixelIndex.toString());
+    formData.append("image", imageFile![0]);
+
+    const { metadataCid } = await fetch("/api/files", {
+      method: "POST",
+      body: formData,
+    }).then((res) => res.json());
 
     try {
       await purchasePixel({
         price: pixelPriceInEther,
         pixelIndex,
-        text: title.trim(),
-        imageUrl: imageUrl.trim(),
-        link: link.trim(),
+        metadataCid,
       });
 
       onSuccess?.();

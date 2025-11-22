@@ -1,5 +1,7 @@
 "use client";
 
+import { Suspense } from "react";
+
 import { useAccount } from "wagmi";
 
 import { Button } from "@/shared/components/Button";
@@ -45,12 +47,12 @@ function PixelBoardContent() {
     ));
   };
 
-  const handlePixelClick = (pixelIndex: number) => {
+  const handlePixelClick = (pixelIndex: number, url?: string) => {
     const pixel = getPixel(pixelIndex);
 
     if (pixel?.isOwned) {
-      if (pixel.link) {
-        window.open(pixel.link, "_blank");
+      if (pixel.metadataCid) {
+        window.open(url, "_blank");
       }
     } else {
       handlePixelPurchase(pixelIndex);
@@ -69,17 +71,31 @@ function PixelBoardContent() {
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div className="overflow-auto p-4">
         <div className="grid grid-cols-3 gap-2 w-fit mx-auto">
-          {pixels.map((pixel) => (
-            <Pixel
-              key={pixel.pixelIndex}
-              pixel={pixel}
-              isOwnedByCurrentUser={
-                address?.toLowerCase() === pixel.owner?.toLowerCase()
-              }
-              onClick={handlePixelClick}
-              handlePixelPurchase={handlePixelPurchase}
-            />
-          ))}
+          {pixels.map((pixel) =>
+            pixel.metadataCid ? (
+              <ErrorBoundary
+                key={pixel.pixelIndex}
+                errorFallback={(props) => <Pixel.ErrorFallback {...props} />}
+              >
+                <Suspense fallback={<Pixel.Fallback />}>
+                  <Pixel
+                    pixel={pixel}
+                    isOwnedByCurrentUser={
+                      address?.toLowerCase() === pixel.owner?.toLowerCase()
+                    }
+                    onClick={handlePixelClick}
+                    handlePixelPurchase={handlePixelPurchase}
+                  />
+                </Suspense>
+              </ErrorBoundary>
+            ) : (
+              <Pixel.Empty
+                key={pixel.pixelIndex}
+                pixel={pixel}
+                onClick={handlePixelClick}
+              />
+            )
+          )}
         </div>
       </div>
     </div>

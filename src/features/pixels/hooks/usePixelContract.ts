@@ -5,10 +5,10 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 
-import { PIXEL_BOARD_ABI, type PixelData } from "@/shared/lib/contract";
+import { PIXEL_BOARD_V2_ABI, type ContractPixel } from "@/shared/lib/contract";
 
 const PIXEL_BOARD_ADDRESS = process.env
-  .NEXT_PUBLIC_PIXEL_BOARD_ADDRESS as `0x${string}`;
+  .NEXT_PUBLIC_PIXEL_BOARD_V2_ADDRESS as `0x${string}`;
 
 // 픽셀 구매 훅
 export function usePurchasePixel() {
@@ -21,29 +21,24 @@ export function usePurchasePixel() {
 
   const purchasePixel = async ({
     pixelIndex,
-    text,
-    imageUrl,
-    link,
+    metadataCid,
     price,
   }: {
     pixelIndex: number;
-    text: string;
-    imageUrl: string;
-    link: string;
+    metadataCid: string;
     price: string;
   }) => {
-    try {
-      await writeContract({
-        address: PIXEL_BOARD_ADDRESS,
-        abi: PIXEL_BOARD_ABI,
-        functionName: "purchasePixel",
-        args: [BigInt(pixelIndex), text, imageUrl, link],
-        value: parseEther(price),
-      });
-    } catch (err) {
-      console.error("Failed to purchase pixel:", err);
-      throw err;
+    if (!metadataCid) {
+      throw new Error("Metadata CID is required");
     }
+
+    writeContract({
+      address: PIXEL_BOARD_ADDRESS,
+      abi: PIXEL_BOARD_V2_ABI,
+      functionName: "purchasePixel",
+      args: [BigInt(pixelIndex), metadataCid],
+      value: parseEther(price),
+    });
   };
 
   return {
@@ -58,7 +53,7 @@ export function usePurchasePixel() {
 export function useGetPixelPrice(pixelIndex: number) {
   const { data: pixelPrice } = useReadContract({
     address: PIXEL_BOARD_ADDRESS,
-    abi: PIXEL_BOARD_ABI,
+    abi: PIXEL_BOARD_V2_ABI,
     functionName: "getPixelPrice",
     args: [BigInt(pixelIndex)],
     chainId: 91342,
@@ -76,18 +71,14 @@ export function useUpdatePixel() {
       hash,
     });
 
-  const updatePixel = async (
-    pixelIndex: number,
-    text: string,
-    imageUrl: string,
-    link: string
-  ) => {
+  const updatePixel = async (pixelIndex: number, metadataCid: string) => {
     try {
       await writeContract({
         address: PIXEL_BOARD_ADDRESS,
-        abi: PIXEL_BOARD_ABI,
+        abi: PIXEL_BOARD_V2_ABI,
         functionName: "updatePixel",
-        args: [BigInt(pixelIndex), text, imageUrl, link],
+        args: [BigInt(pixelIndex), metadataCid],
+        chainId: 91342,
       });
     } catch (err) {
       console.error("Failed to update pixel:", err);
@@ -108,14 +99,14 @@ export function useUpdatePixel() {
 export function usePixel(pixelIndex: number) {
   const { data, isLoading, error, refetch } = useReadContract({
     address: PIXEL_BOARD_ADDRESS,
-    abi: PIXEL_BOARD_ABI,
+    abi: PIXEL_BOARD_V2_ABI,
     functionName: "getPixel",
     args: [BigInt(pixelIndex)],
     chainId: 91342,
   });
 
   return {
-    pixel: data as PixelData | undefined,
+    pixel: data as ContractPixel | undefined,
     isLoading,
     error,
     refetch,
@@ -126,13 +117,13 @@ export function usePixel(pixelIndex: number) {
 export function useAllPixels() {
   const { data, isLoading, error, refetch } = useReadContract({
     address: PIXEL_BOARD_ADDRESS,
-    abi: PIXEL_BOARD_ABI,
+    abi: PIXEL_BOARD_V2_ABI,
     functionName: "getAllPixels",
     chainId: 91342,
   });
 
   return {
-    pixels: data as PixelData[] | undefined,
+    pixels: data as ContractPixel[] | undefined,
     isLoading,
     error,
     refetch,
@@ -143,14 +134,14 @@ export function useAllPixels() {
 export function useContractInfo() {
   const { data: totalPixels } = useReadContract({
     address: PIXEL_BOARD_ADDRESS,
-    abi: PIXEL_BOARD_ABI,
+    abi: PIXEL_BOARD_V2_ABI,
     functionName: "TOTAL_PIXELS",
     chainId: 91342,
   });
 
   const { data: totalPixelsSold } = useReadContract({
     address: PIXEL_BOARD_ADDRESS,
-    abi: PIXEL_BOARD_ABI,
+    abi: PIXEL_BOARD_V2_ABI,
     functionName: "totalPixelsSold",
     chainId: 91342,
   });

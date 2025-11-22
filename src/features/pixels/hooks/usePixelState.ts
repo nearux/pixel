@@ -1,15 +1,20 @@
 import { useState, useEffect } from "react";
 
+import { Pixel, type ContractPixel } from "@/shared/lib/contract";
+
 import { useAllPixels } from "./usePixelContract";
 
-export interface Pixel {
-  pixelIndex: number;
-  text: string;
-  imageUrl: string;
-  link: string;
-  owner: string;
-  isOwned: boolean;
-  purchaseTime: number;
+function convertPixelDataToPixel(
+  pixelData: ContractPixel,
+  pixelIndex: number
+): Pixel {
+  return {
+    pixelIndex,
+    owner: pixelData?.owner || "",
+    metadataCid: pixelData?.metadataCid || "",
+    isOwned: pixelData?.isOwned || false,
+    purchaseTime: pixelData?.purchaseTime || BigInt(0),
+  };
 }
 
 export function usePixelState() {
@@ -19,34 +24,21 @@ export function usePixelState() {
     error,
     refetch,
   } = useAllPixels();
-  const [localPixels, setLocalPixels] = useState<Pixel[]>([]);
+
+  const [pixels, setPixels] = useState<Pixel[]>([]);
 
   useEffect(() => {
     if (blockchainPixels) {
-      const convertedPixels: Pixel[] = [];
+      const convertedPixels = blockchainPixels.map((blockchainPixel, index) =>
+        convertPixelDataToPixel(blockchainPixel, index)
+      );
 
-      for (let x = 0; x < blockchainPixels.length; x++) {
-        const blockchainPixel = blockchainPixels[x];
-
-        convertedPixels.push({
-          pixelIndex: x,
-          text: blockchainPixel?.text || "",
-          imageUrl: blockchainPixel?.imageUrl || "",
-          link: blockchainPixel?.link || "",
-          owner: blockchainPixel?.owner || "",
-          isOwned: blockchainPixel?.isOwned || false,
-          purchaseTime: blockchainPixel?.purchaseTime
-            ? Number(blockchainPixel.purchaseTime)
-            : 0,
-        });
-      }
-
-      setLocalPixels(convertedPixels);
+      setPixels(convertedPixels);
     }
   }, [blockchainPixels]);
 
   const getPixel = (pixelIndex: number): Pixel | undefined => {
-    return localPixels.find((pixel) => pixel.pixelIndex === pixelIndex);
+    return pixels.find((pixel) => pixel.pixelIndex === pixelIndex);
   };
 
   const refreshPixels = () => {
@@ -54,7 +46,7 @@ export function usePixelState() {
   };
 
   return {
-    pixels: localPixels,
+    pixels,
     isLoading,
     error,
     refreshPixels,
