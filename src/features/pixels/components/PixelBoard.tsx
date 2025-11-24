@@ -9,7 +9,7 @@ import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
 import { toast } from "@/shared/components/Toast/toastManager";
 import { useOverlay } from "@/shared/hooks/useOverlay";
 
-import { usePixelState } from "../hooks";
+import { useAllPixels } from "../hooks";
 import Pixel from "./Pixel";
 import { PixelPurchaseModal } from "./PixelPurchaseModal";
 import { deleteMetadata } from "../api/deleteMetadata";
@@ -21,7 +21,15 @@ export function PixelBoard() {
     <ErrorBoundary
       errorFallback={(props) => <PixelBoardContent.ErrorFallback {...props} />}
     >
-      <PixelBoardContent />
+      <Suspense
+        fallback={
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="text-gray-600">Loading pixel data...</div>
+          </div>
+        }
+      >
+        <PixelBoardContent />
+      </Suspense>
     </ErrorBoundary>
   );
 }
@@ -30,7 +38,7 @@ function PixelBoardContent() {
   const overlay = useOverlay();
   const { isConnected, address } = useAccount();
 
-  const { isLoading, refreshPixels, getPixel, pixels } = usePixelState();
+  const { pixels, getPixel, refreshPixels } = useAllPixels();
 
   const handlePixelPurchase = (pixelId: bigint, metadataCid?: string) => {
     if (!isConnected) {
@@ -65,14 +73,6 @@ function PixelBoardContent() {
       handlePixelPurchase(pixelId);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="w-full h-full flex items-center justify-center">
-        <div className="text-gray-600">Loading pixel data...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">

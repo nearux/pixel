@@ -1,11 +1,8 @@
-export { usePixelState } from "./usePixelState";
+export { useAllPixels } from "./useAllPixels";
 export {
   usePurchasePixel,
   useGetPixelPrice,
   useUpdatePixel,
-  usePixel,
-  useAllPixels,
-  useContractInfo,
 } from "./usePixelContract";
 export { usePixelMetadata } from "./usePixelMetadata";
 export { useTransactionNotify } from "./useTransactionNotify";

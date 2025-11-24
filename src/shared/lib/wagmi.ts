@@ -3,7 +3,7 @@ import { mainnet, sepolia } from "wagmi/chains";
 import { metaMask } from "wagmi/connectors";
 
 // GIWA Sepolia Testnet 설정
-const giwaSepolia = {
+export const giwaSepolia = {
   id: 91342,
   name: "GIWA Sepolia",
   nativeCurrency: {
