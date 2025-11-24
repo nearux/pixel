@@ -1,5 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 
+import { pinata } from "@/shared/lib/pinata";
+
 export interface PixelMetadata {
   text: string;
   link: string;
@@ -9,12 +11,9 @@ export interface PixelMetadata {
 export async function fetchMetadata(
   metadataCid: string
 ): Promise<PixelMetadata> {
-  const url = `${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${metadataCid}`;
-  const response = await fetch(url);
+  const { data } = await pinata.gateways.public.get(metadataCid);
 
-  const metadata = await response.json();
-
-  return metadata as PixelMetadata;
+  return data as unknown as PixelMetadata;
 }
 
 const pixelMetadataQueryKey = {
@@ -29,7 +28,6 @@ export function usePixelMetadata(metadataCid: string) {
   return useSuspenseQuery({
     queryKey: pixelMetadataQueryKey.specific(metadataCid),
     queryFn: () => fetchMetadata(metadataCid),
-    staleTime: 5 * 60 * 1000, // 5분간 캐시
     retry: false,
   });
 }
