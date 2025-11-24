@@ -21,13 +21,7 @@ export function PixelBoard() {
     <ErrorBoundary
       errorFallback={(props) => <PixelBoardContent.ErrorFallback {...props} />}
     >
-      <Suspense
-        fallback={
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-gray-600">Loading pixel data...</div>
-          </div>
-        }
-      >
+      <Suspense fallback={<PixelBoardContent.Fallback />}>
         <PixelBoardContent />
       </Suspense>
     </ErrorBoundary>
@@ -116,6 +110,14 @@ PixelBoardContent.ErrorFallback = ({ resetErrorBoundary }: FallbackProps) => {
         <p className="font-bold mb-2">Failed to load pixel data</p>
       </div>
       <Button onClick={() => resetErrorBoundary()}>Retry</Button>
+    </div>
+  );
+};
+
+PixelBoardContent.Fallback = () => {
+  return (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="text-gray-600">Loading pixel data...</div>
     </div>
   );
 };
