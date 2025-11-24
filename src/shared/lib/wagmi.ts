@@ -30,6 +30,7 @@ export const giwaSepolia = {
 
 export const config = createConfig({
   chains: [giwaSepolia, sepolia, mainnet],
+  ssr: true,
   connectors: [metaMask()],
   transports: {
     [giwaSepolia.id]: http(),
